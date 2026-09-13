@@ -1,0 +1,17 @@
+{
+  "name": "sikat-bumkam-torei-natei",
+  "version": "1.0.0",
+  "description": "Sistem Informasi Kas Ayam Ternak — BUMKam Torei Natei",
+  "type": "module",
+  "scripts": {
+    "test": "vitest --run",
+    "test:coverage": "vitest --run --coverage"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "10.4.0",
+    "@vitest/coverage-v8": "1.6.0",
+    "fast-check": "3.19.0",
+    "jsdom": "24.1.1",
+    "vitest": "1.6.0"
+  }
+}

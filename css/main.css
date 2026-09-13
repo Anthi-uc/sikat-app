@@ -1,0 +1,224 @@
+/* ============================================================
+   main.css — Gaya global SIKAT
+   ============================================================ */
+
+/* ── CSS Custom Properties ── */
+:root {
+  /* Colors */
+  --color-primary:       #16a34a;   /* hijau utama — WCAG AA on white */
+  --color-primary-dark:  #15803d;
+  --color-primary-light: #dcfce7;
+  --color-danger:        #dc2626;   /* merah pengeluaran — WCAG AA on white */
+  --color-danger-light:  #fee2e2;
+  --color-warning:       #d97706;
+  --color-warning-light: #fef3c7;
+  --color-text:          #1f2937;
+  --color-text-muted:    #6b7280;
+  --color-border:        #e5e7eb;
+  --color-bg:            #f9fafb;
+  --color-surface:       #ffffff;
+
+  /* Typography */
+  --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-size-xs:   0.75rem;   /* 12px */
+  --font-size-sm:   0.875rem;  /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg:   1.125rem;  /* 18px */
+  --font-size-xl:   1.25rem;   /* 20px */
+  --font-size-2xl:  1.5rem;    /* 24px */
+  --font-size-3xl:  1.875rem;  /* 30px */
+  --font-size-4xl:  2.25rem;   /* 36px */
+
+  /* Spacing */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* Border radius */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.08);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.10);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+
+  /* Layout */
+  --header-height: 64px;
+  --max-content-width: 960px;
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+img, svg {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+ul, ol { list-style: none; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* ── Hidden utility ── */
+[hidden] { display: none !important; }
+
+/* ── App Shell Layout ── */
+#app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#header-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-primary);
+}
+
+#view-container {
+  flex: 1;
+  width: 100%;
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+#footer-container {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+/* ── Splash Screen ── */
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.splash-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  padding: var(--space-6);
+}
+
+.splash-logo .logo-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Water drop shape inside logo icon using clip-path */
+.splash-logo .logo-icon::after {
+  content: '';
+  width: 28px;
+  height: 28px;
+  background: white;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  position: absolute;
+}
+
+.splash-title {
+  font-size: var(--font-size-4xl);
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+}
+
+.splash-subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+}
+
+.splash-org {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── Responsive: Desktop ── */
+@media (min-width: 768px) {
+  #view-container {
+    padding: var(--space-6) var(--space-8);
+  }
+}
+
+@media (min-width: 1024px) {
+  #view-container {
+    padding: var(--space-8);
+  }
+}
+
+/* ── Notification Container ── */
+#notification-container {
+  position: fixed;
+  top: calc(var(--header-height) + var(--space-4));
+  right: var(--space-4);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: min(360px, calc(100vw - 2rem));
+}

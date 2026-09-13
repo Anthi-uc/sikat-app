@@ -1,0 +1,338 @@
+/* ============================================================
+   views.css — Gaya spesifik per halaman SIKAT
+   ============================================================ */
+
+/* ══════════════════════════════════════════════════════════════
+   HOME VIEW — Menu Utama
+   ══════════════════════════════════════════════════════════════ */
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.menu-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.menu-card:hover,
+.menu-card:focus-visible {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.menu-card:active { transform: scale(0.97); }
+
+.menu-card-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.menu-card-title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.menu-card-desc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+/* Aksi Cepat */
+.quick-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.quick-actions .btn { flex: 1; min-width: 140px; }
+
+/* Ringkasan Hari Ini — Home */
+.summary-today {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.summary-today-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.summary-today-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.summary-today-value {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.summary-today-unit {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   TRANSAKSI VIEW — Input Transaksi
+   ══════════════════════════════════════════════════════════════ */
+
+.transaksi-form {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-6);
+}
+
+/* Jumlah Rak field hidden by default */
+#group-jumlah-rak {
+  display: none;
+}
+
+#group-jumlah-rak.visible {
+  display: flex;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   REKAP KAS VIEW
+   ══════════════════════════════════════════════════════════════ */
+
+.tx-list {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-6);
+}
+
+.tx-list-title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+  color: var(--color-text);
+}
+
+.rekap-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.rekap-summary-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.rekap-summary-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.rekap-summary-value {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   LABA RUGI VIEW
+   ══════════════════════════════════════════════════════════════ */
+
+.labarugi-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-4);
+}
+
+.labarugi-table th,
+.labarugi-table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+}
+
+.labarugi-table th {
+  font-weight: 700;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--color-bg);
+}
+
+.labarugi-table .row-untung td {
+  font-size: var(--font-size-xl);  /* ≥20px */
+  font-weight: 700;
+  border-top: 2px solid var(--color-border);
+  border-bottom: none;
+  padding-top: var(--space-4);
+}
+
+.untung-positif { color: var(--color-primary); }
+.untung-negatif { color: var(--color-danger); }
+.untung-netral  { color: var(--color-text-muted); }
+
+/* Margin Keuntungan box */
+.margin-box {
+  background: var(--color-primary-light);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  text-align: center;
+}
+
+.margin-box-label {
+  font-size: var(--font-size-sm);
+  color: #14532d;
+  margin-bottom: var(--space-2);
+}
+
+.margin-box-value {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PRODUKSI VIEW
+   ══════════════════════════════════════════════════════════════ */
+
+.produksi-form {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-6);
+}
+
+.produksi-list {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-6);
+}
+
+.produksi-list-title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+}
+
+.produksi-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-3);
+}
+.produksi-item:last-child { border-bottom: none; }
+
+.produksi-item-date {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  flex: 1;
+}
+
+.produksi-item-rak {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   404 — Halaman Tidak Ditemukan
+   ══════════════════════════════════════════════════════════════ */
+
+.not-found {
+  text-align: center;
+  padding: var(--space-12) var(--space-4);
+}
+
+.not-found-code {
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--color-border);
+  line-height: 1;
+}
+
+.not-found-title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-text);
+  margin: var(--space-4) 0 var(--space-2);
+}
+
+.not-found-desc {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-6);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE ADJUSTMENTS
+   ══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 360px) {
+  .menu-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+  .menu-card { padding: var(--space-3); }
+  .summary-today { grid-template-columns: 1fr 1fr; }
+  .quick-actions { flex-direction: column; }
+  .quick-actions .btn { min-width: unset; }
+}
+
+@media (min-width: 640px) {
+  .menu-grid { grid-template-columns: repeat(4, 1fr); }
+  .summary-today { grid-template-columns: repeat(4, 1fr); }
+  .rekap-summary-grid { grid-template-columns: repeat(4, 1fr); }
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#16a34a">
+  <meta name="description" content="Sistem Informasi Kas Ayam Ternak — BUMKam Torei Natei">
+  <title>SIKAT — BUMKam Torei Natei</title>
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Favicons (files don't exist yet — just add the tags) -->
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/icon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+
+  <!-- CSS (in order) -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/views.css">
+</head>
+<body>
+
+  <!-- Splash Screen (shown first, hidden after 1–2s) -->
+  <div id="splash-screen" aria-live="polite">
+    <div class="splash-logo">
+      <div class="logo-icon" aria-hidden="true"></div>
+      <h1 class="splash-title">SIKAT</h1>
+      <p class="splash-subtitle">Sistem Informasi Kas Ayam Ternak</p>
+      <p class="splash-org">BUMKam Torei Natei • Kampung Yakonde</p>
+    </div>
+  </div>
+
+  <!-- App Shell (hidden until splash finishes) -->
+  <div id="app-shell" hidden>
+    <header id="header-container" role="banner"></header>
+
+    <main id="view-container" role="main" tabindex="-1"></main>
+
+    <footer id="footer-container" role="contentinfo"></footer>
+  </div>
+
+  <!-- Notification container (rendered by app.js) -->
+  <div id="notification-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Chart.js from CDN (cached by service worker) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <!-- SheetJS (xlsx) for Excel export — cached by service worker -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- App modules — order matters for ES module loading -->
+  <!-- Use type="module" so ES module imports work natively -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
