@@ -130,4 +130,16 @@ export const StorageService = {
     localStorage.removeItem(KEYS.TRANSACTIONS);
     localStorage.removeItem(KEYS.PRODUCTIONS);
   },
+
+deleteTransaction(id) {
+    try {
+      const transactions = this.getTransactions();
+      const filtered = transactions.filter((tx) => tx.id !== id);
+      localStorage.setItem(txKey(), JSON.stringify(filtered));
+      return true;
+    } catch (e) {
+      console.error('[StorageService] Gagal menghapus transaksi:', e);
+      return false;
+    }
+  }
 };

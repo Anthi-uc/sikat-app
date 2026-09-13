@@ -46,10 +46,15 @@ function buildRiwayatHTML(productions) {
   }
   return sorted.map(p => `
     <div class="produksi-item">
+    <div>
       <span class="produksi-item-date">${formatTanggal(p.tanggal)}</span>
       <span class="produksi-item-rak">${p.jumlahRak} Rak</span>
       <span class="badge badge-success">Terinput</span>
-    </div>`).join('');
+      </div>
+      <button type="button" class="btn-delete-prod" data-tanggal="${p.tanggal}" title="Hapus Data Produksi" style="color: #e53e3e; background: none; border: none; cursor: pointer; padding: 4px; font-size: 16px;">
+        🗑️
+      </button>    
+      </div>`).join('');
 }
 
 // ─── render ───────────────────────────────────────────────────────────────────
@@ -228,3 +233,17 @@ export function attachListeners(params = {}) {
     showNotification('Data produksi berhasil disimpan!', 'success', 3000);
   });
 }
+const prodContainer = document.getElementById('produksi-list-container');
+  if (prodContainer) {
+    prodContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-delete-prod');
+      if (!btn) return;
+
+      const tanggal = btn.dataset.tanggal;
+      if (confirm(`Apakah Anda yakin ingin menghapus catatan produksi tanggal ${formatTanggal(tanggal)}?`)) {
+        StorageService.deleteProduction(tanggal);
+        refreshUI();
+        showNotification('Data produksi berhasil dihapus', 'info', 3000);
+      }
+    });
+  }
