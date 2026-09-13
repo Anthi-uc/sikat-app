@@ -97,6 +97,10 @@ export function render(params = {}) {
         <p class="tx-item-amount ${t.jenis === 'penjualan_telur' ? 'amount-income' : 'amount-expense'}">
           ${t.jenis === 'penjualan_telur' ? '+' : '-'}${formatRupiah(t.nominal)}
         </p>
+        <button type="button" class="btn-delete-tx" data-id="${t.id}" title="Hapus Transaksi" style="color: #e53e3e; background: none; border: none; cursor: pointer; padding: 4px; font-size: 16px;">
+            🗑️
+            </button>
+        </div>
       </div>`,
       )
       .join('');
@@ -130,4 +134,18 @@ export function render(params = {}) {
 
 // ─── attachListeners ─────────────────────────────────────────────────────────
 
-export function attachListeners(params = {}) {}
+export function attachListeners(params = {}) {
+  const txContainer = document.querySelector('.tx-list');
+  if (txContainer) {
+    txContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-delete-tx');
+      if (!btn) return;
+      
+      const txId = btn.dataset.id;
+      if (confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) {
+        StorageService.deleteTransaction(txId);
+        window.location.reload();
+      }
+    });
+  }
+}
