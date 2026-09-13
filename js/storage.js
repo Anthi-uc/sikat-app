@@ -51,11 +51,78 @@ function dateAgo(daysAgo) {
 
 const DUMMY_TRANSACTIONS = [];
 const DUMMY_PRODUCTIONS = [];
+
+// ─── StorageService ─────────────────────────────────────────────────────────
+
+export const StorageService = {
+  getTransactions() {
+    try {
+      const raw = localStorage.getItem(txKey());
+      if (!raw) return [];
+      return JSON.parse(raw);
+    } catch (e) {
+      console.error('[StorageService] Gagal membaca transaksi:', e);
+      return [];
+    }
+  },
+
+  getProductions() {
+    try {
+      const raw = localStorage.getItem(prodKey());
+      if (!raw) return [];
+      return JSON.parse(raw);
+    } catch (e) {
+      console.error('[StorageService] Gagal membaca produksi:', e);
+      return [];
+    }
+  },
+
+  saveTransaction(tx) {
+    try {
+      const transactions = this.getTransactions();
+      transactions.push(tx);
+      try {
+        localStorage.setItem(txKey(), JSON.stringify(transactions));
+      } catch (e) {
+        if (e instanceof DOMException && (e.name === 'QuotaExceededError' || e.code === 22)) {
+          throw new StorageError('Penyimpanan penuh. Hapus data lama atau bersihkan cache browser.');
+        }
+        throw e;
+      }
+    } catch (e) {
+      if (e instanceof StorageError) throw e;
+      console.error('[StorageService] Gagal menyimpan transaksi:', e);
+      throw e;
+    }
+  },
+
+  saveProduction(prod, confirmOverwrite = false) {
+    const productions = this.getProductions();
+    const existingIndex = productions.findIndex((p) => p.tanggal === prod.tanggal);
+
+    if (existingIndex !== -1) {
+      if (!confirmOverwrite) return 'needs_confirmation';
+      productions[existingIndex] = prod;
+    } else {
+      productions.push(prod);
+    }
+
+    try {
+      localStorage.setItem(prodKey(), JSON.stringify(productions));
+    } catch (e) {
+      if (e instanceof DOMException && (e.name === 'QuotaExceededError' || e.code === 22)) {
+        throw new StorageError('Penyimpanan penuh. Hapus data lama atau bersihkan cache browser.');
+      }
+      console.error('[StorageService] Gagal menyimpan produksi:', e);
+      throw e;
+    }
+
+    return 'saved';
   },
 
   initDummyData() {
- return;
-},
+    return;
+  },
 
   clearAll() {
     localStorage.removeItem(txKey());
