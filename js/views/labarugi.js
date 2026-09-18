@@ -1,4 +1,4 @@
-// labarugi.js — Modul Laporan Keuangan SIKAT
+// labarugi.js â€” Modul Laporan Keuangan SIKAT
 // 6 tab: Laba Rugi | Arus Kas | Neraca | CALK | Buku Kas | Cetak
 
 import { StorageService }    from '../storage.js';
@@ -7,9 +7,9 @@ import { ChartManager }      from '../charts.js';
 import { showNotification }  from '../app.js';
 import { generateId }        from '../storage.js';
 
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SHARED HELPERS
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 const _BULAN_NAMA = [
   'Januari','Februari','Maret','April','Mei','Juni',
@@ -17,12 +17,12 @@ const _BULAN_NAMA = [
 ];
 
 const _TABS = [
-  { id: 'labarugi',  icon: '📊', label: 'Laba Rugi'  },
-  { id: 'aruskas',   icon: '💸', label: 'Arus Kas'   },
-  { id: 'neraca',    icon: '⚖️',  label: 'Neraca'     },
-  { id: 'calk',      icon: '📝', label: 'CALK'       },
-  { id: 'bukukas',   icon: '📒', label: 'Buku Kas'   },
-  { id: 'cetak',     icon: '🖨️',  label: 'Cetak'      },
+  { id: 'labarugi',  icon: 'ðŸ“Š', label: 'Laba Rugi'  },
+  { id: 'aruskas',   icon: 'ðŸ’¸', label: 'Arus Kas'   },
+  { id: 'neraca',    icon: 'âš–ï¸',  label: 'Neraca'     },
+  { id: 'calk',      icon: 'ðŸ“', label: 'CALK'       },
+  { id: 'bukukas',   icon: 'ðŸ“’', label: 'Buku Kas'   },
+  { id: 'cetak',     icon: 'ðŸ–¨ï¸',  label: 'Cetak'      },
 ];
 
 function fRp(n)  { return 'Rp ' + Number(n).toLocaleString('id-ID'); }
@@ -104,10 +104,10 @@ function toolbarHTML(tabId, bulanLabel) {
       <div></div>
       <div class="laporan-toolbar-right">
         <button class="btn btn-outline btn-sm" id="btn-export-excel-${tabId}" title="Export ke Excel">
-          📥 Excel
+          ðŸ“¥ Excel
         </button>
         <button class="btn btn-primary btn-sm" id="btn-cetak-${tabId}" title="Cetak laporan ini">
-          🖨️ Cetak
+          ðŸ–¨ï¸ Cetak
         </button>
       </div>
     </div>`;
@@ -124,9 +124,9 @@ function monthNavHTML(idPrefix, year, month, nowYear, nowMonth) {
     </div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MODULE STATE
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 const _now = new Date();
 let _activeTab  = 'labarugi';
@@ -143,9 +143,9 @@ let _bkMonth    = _now.getMonth();
 // Buku Kas edit state
 let _bkEditId   = null;
 
-// ═══════════════════════════════════════════════════════════════
-// RENDER — Shell (tabs + panel)
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// RENDER â€” Shell (tabs + panel)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export function render(params = {}) {
   // Reset state on fresh navigation
@@ -163,9 +163,9 @@ export function render(params = {}) {
 
   return `
     <div class="welcome-card">
-      <div class="icon">📋</div>
+      <div class="icon">ðŸ“‹</div>
       <h2>Laporan Keuangan</h2>
-      <p>BUMKam Torei Natei — Sistem Informasi Kas Ayam Ternak</p>
+      <p>BUMKam Torei Natei â€” Sistem Informasi Kas Ayam Ternak</p>
     </div>
 
     <div role="tablist" aria-label="Tab Laporan" class="laporan-tabs">
@@ -178,9 +178,9 @@ export function render(params = {}) {
   `;
 }
 
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // PANEL DISPATCHER
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function _renderPanel(tab) {
   switch (tab) {
@@ -194,9 +194,9 @@ function _renderPanel(tab) {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TAB 1 — LABA RUGI
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// TAB 1 â€” LABA RUGI
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function _calcLabarugi(year, month) {
   const txs     = StorageService.getTransactions();
@@ -228,7 +228,7 @@ function _renderLabarugi() {
       ${toolbarHTML('labarugi', bulanLabel)}
       ${monthNavHTML('lr', _lrYear, _lrMonth, _now.getFullYear(), _now.getMonth())}
 
-      <p class="laporan-section-title">📊 Laba Rugi — ${bulanLabel}</p>
+      <p class="laporan-section-title">ðŸ“Š Laba Rugi â€” ${bulanLabel}</p>
 
       <table class="laporan-table">
         <thead><tr><th>Keterangan</th><th class="text-right">Jumlah</th></tr></thead>
@@ -262,7 +262,7 @@ function _renderLabarugi() {
       </div>
 
       <!-- Chart -->
-      <p class="laporan-section-title no-print">📈 Grafik Pendapatan vs Beban (4 Bulan)</p>
+      <p class="laporan-section-title no-print">ðŸ“ˆ Grafik Pendapatan vs Beban (4 Bulan)</p>
       <div class="chart-container no-print" style="height:220px">
         <canvas id="chart-lr" aria-label="Grafik Laba Rugi"></canvas>
       </div>
@@ -271,9 +271,9 @@ function _renderLabarugi() {
     </div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TAB 2 — ARUS KAS
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// TAB 2 â€” ARUS KAS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function _renderArusKas() {
   const txs          = StorageService.getTransactions();
@@ -299,8 +299,8 @@ function _renderArusKas() {
         <td>${fDate(t.tanggal)}</td>
         <td>${escH(jenisLabel(t.jenis, t.keterangan))}</td>
         <td>${escH(t.lokasi)}</td>
-        <td class="text-right kredit">${inc > 0 ? fRp(inc) : '—'}</td>
-        <td class="text-right debit">${exp > 0 ? fRp(exp) : '—'}</td>
+        <td class="text-right kredit">${inc > 0 ? fRp(inc) : 'â€”'}</td>
+        <td class="text-right debit">${exp > 0 ? fRp(exp) : 'â€”'}</td>
         <td class="text-right ${saldoClass}">${fRp(running)}</td>
       </tr>`;
   });
@@ -314,7 +314,7 @@ function _renderArusKas() {
       ${toolbarHTML('aruskas', bulanLabel)}
       ${monthNavHTML('ak', _akYear, _akMonth, _now.getFullYear(), _now.getMonth())}
 
-      <p class="laporan-section-title">💸 Arus Kas — ${bulanLabel}</p>
+      <p class="laporan-section-title">ðŸ’¸ Arus Kas â€” ${bulanLabel}</p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-4)">
         <div class="summary-box" style="padding:var(--space-3)">
@@ -328,7 +328,7 @@ function _renderArusKas() {
       </div>
 
       ${isEmpty
-        ? '<div class="empty-state"><div class="empty-state-icon">💸</div><p class="empty-state-message">Belum ada transaksi bulan ini</p></div>'
+        ? '<div class="empty-state"><div class="empty-state-icon">ðŸ’¸</div><p class="empty-state-message">Belum ada transaksi bulan ini</p></div>'
         : `<div style="overflow-x:auto">
             <table class="laporan-table" id="tabel-aruskas">
               <thead>
@@ -343,7 +343,7 @@ function _renderArusKas() {
               </thead>
               <tbody>
                 <tr style="font-style:italic;color:var(--color-text-muted)">
-                  <td>—</td><td colspan="4">Saldo Awal</td>
+                  <td>â€”</td><td colspan="4">Saldo Awal</td>
                   <td class="text-right ${saldoAwal>=0?'saldo-positif':'saldo-negatif'}">${fRp(saldoAwal)}</td>
                 </tr>
                 ${rows}
@@ -356,9 +356,9 @@ function _renderArusKas() {
     </div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TAB 3 — NERACA
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// TAB 3 â€” NERACA
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function _renderNeraca() {
   const bulanLabel = `${_BULAN_NAMA[_neMonth]} ${_neYear}`;
@@ -371,7 +371,7 @@ function _renderNeraca() {
   const txsUpTo    = txs.filter(t => t.tanggal <= endOfMonth);
   const kas        = txsUpTo.reduce((s,t) => isIncome(t.jenis) ? s+t.nominal : s-t.nominal, 0);
 
-  // Nilai stok: stok butir × hargaJualPerButir
+  // Nilai stok: stok butir Ã— hargaJualPerButir
   const stok        = StorageService.getStokTelur();
   const nilaiStok   = stok * settings.hargaJualPerButir;
 
@@ -386,7 +386,7 @@ function _renderNeraca() {
       ${toolbarHTML('neraca', bulanLabel)}
       ${monthNavHTML('ne', _neYear, _neMonth, _now.getFullYear(), _now.getMonth())}
 
-      <p class="laporan-section-title">⚖️ Neraca — per akhir ${bulanLabel}</p>
+      <p class="laporan-section-title">âš–ï¸ Neraca â€” per akhir ${bulanLabel}</p>
 
       <div class="neraca-grid">
         <div class="neraca-box neraca-box-aset">
@@ -394,7 +394,7 @@ function _renderNeraca() {
           <p class="neraca-box-amount">${fRp(totalAset)}</p>
           <p class="neraca-box-sub">Kas: ${fRp(Math.max(0,kas))}</p>
           <p class="neraca-box-sub">Stok Telur: ${fRp(nilaiStok)}</p>
-          <p class="neraca-box-sub" style="font-size:0.65rem;opacity:0.7">(${stok.toLocaleString('id-ID')} butir × ${fRp(settings.hargaJualPerButir)})</p>
+          <p class="neraca-box-sub" style="font-size:0.65rem;opacity:0.7">(${stok.toLocaleString('id-ID')} butir Ã— ${fRp(settings.hargaJualPerButir)})</p>
         </div>
         <div class="neraca-box neraca-box-kewajiban">
           <p class="neraca-box-label">Kewajiban</p>
@@ -406,7 +406,7 @@ function _renderNeraca() {
       <div class="neraca-box neraca-box-modal" style="margin-bottom:var(--space-5)">
         <p class="neraca-box-label">Modal / Ekuitas</p>
         <p class="neraca-box-amount">${fRp(modal)}</p>
-        <p class="neraca-box-sub">Modal = Aset − Kewajiban</p>
+        <p class="neraca-box-sub">Modal = Aset âˆ’ Kewajiban</p>
       </div>
 
       <table class="laporan-table">
@@ -424,9 +424,9 @@ function _renderNeraca() {
     </div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TAB 4 — CALK
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// TAB 4 â€” CALK
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function _renderCalk() {
   const bulanLabel = `${_BULAN_NAMA[_calkMonth]} ${_calkYear}`;
@@ -462,13 +462,13 @@ function _renderCalk() {
       title: 'Kebijakan Pencatatan Produksi',
       body:  `Konversi produksi: <strong>1 rak = ${settings.isiPerRak} butir</strong>. 
               Bulan ini tercatat <strong>${totalRak} rak</strong> 
-              (≈ <strong>${totalButir.toLocaleString('id-ID')} butir</strong>) dari 
+              (â‰ˆ <strong>${totalButir.toLocaleString('id-ID')} butir</strong>) dari 
               ${prodsMonth.length} entri produksi.`,
     },
     {
       title: 'Persediaan Telur',
       body:  `Saldo persediaan telur per saat ini: <strong>${stok.toLocaleString('id-ID')} butir</strong> 
-              (≈ ${(stok / settings.isiPerRak).toFixed(1)} rak). 
+              (â‰ˆ ${(stok / settings.isiPerRak).toFixed(1)} rak). 
               Dinilai berdasarkan harga jual <strong>${fRp(settings.hargaJualPerButir)}/butir</strong>, 
               total nilai persediaan: <strong>${fRp(stok * settings.hargaJualPerButir)}</strong>.`,
     },
@@ -484,7 +484,7 @@ function _renderCalk() {
       body:  biayaLain.length === 0
         ? `Tidak ada biaya lain-lain yang tercatat pada bulan ${bulanLabel}.`
         : topBiaya.map(t =>
-            `• <strong>${escH(t.keterangan || 'Tidak berketerangan')}</strong> — ${fRp(t.nominal)} 
+            `â€¢ <strong>${escH(t.keterangan || 'Tidak berketerangan')}</strong> â€” ${fRp(t.nominal)} 
              (${fDate(t.tanggal)}, ${escH(t.lokasi)})`
           ).join('<br>') + (biayaLain.length > 3
             ? `<br>... dan ${biayaLain.length - 3} entri lainnya.` : ''),
@@ -493,7 +493,7 @@ function _renderCalk() {
       title: 'Catatan Lain',
       body:  `Semua data disimpan secara lokal di perangkat pengguna (LocalStorage). 
               Tidak ada transfer data ke server eksternal. 
-              Laporan ini dicetak oleh sistem <strong>SIKAT</strong> — 
+              Laporan ini dicetak oleh sistem <strong>SIKAT</strong> â€” 
               Sistem Informasi Kas Ayam Ternak, BUMKam Torei Natei.`,
     },
   ];
@@ -514,16 +514,16 @@ function _renderCalk() {
       ${toolbarHTML('calk', bulanLabel)}
       ${monthNavHTML('calk', _calkYear, _calkMonth, _now.getFullYear(), _now.getMonth())}
 
-      <p class="laporan-section-title">📝 CALK — ${bulanLabel}</p>
+      <p class="laporan-section-title">ðŸ“ CALK â€” ${bulanLabel}</p>
       <ul class="calk-list" id="calk-list">${listHTML}</ul>
 
       <div class="print-only">${ttdHTML()}</div>
     </div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TAB 5 — BUKU KAS
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// TAB 5 â€” BUKU KAS
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function _renderBukuKas() {
   const bulanLabel = `${_BULAN_NAMA[_bkMonth]} ${_bkYear}`;
@@ -546,13 +546,13 @@ function _renderBukuKas() {
         <td>${fDate(t.tanggal)}</td>
         <td>${escH(jenisLabel(t.jenis, t.keterangan))}</td>
         <td>${escH(t.lokasi)}</td>
-        <td class="text-right debit">${debit  > 0 ? fRp(debit)  : '—'}</td>
-        <td class="text-right kredit">${kredit > 0 ? fRp(kredit) : '—'}</td>
+        <td class="text-right debit">${debit  > 0 ? fRp(debit)  : 'â€”'}</td>
+        <td class="text-right kredit">${kredit > 0 ? fRp(kredit) : 'â€”'}</td>
         <td class="text-right ${sc}">${fRp(saldo)}</td>
         <td class="no-print">
           <div class="buku-kas-actions">
-            <button class="btn-edit-tx"   data-id="${escH(t.id)}" title="Edit">✏️</button>
-            <button class="btn-delete-tx" data-id="${escH(t.id)}" title="Hapus">🗑️</button>
+            <button class="btn-edit-tx"   data-id="${escH(t.id)}" title="Edit">âœï¸</button>
+            <button class="btn-delete-tx" data-id="${escH(t.id)}" title="Hapus">ðŸ—‘ï¸</button>
           </div>
         </td>
       </tr>`;
@@ -566,7 +566,7 @@ function _renderBukuKas() {
       ${monthNavHTML('bk', _bkYear, _bkMonth, _now.getFullYear(), _now.getMonth())}
 
       <div class="laporan-toolbar no-print" style="margin-top:0;margin-bottom:var(--space-3)">
-        <button class="btn btn-primary btn-sm" id="btn-tambah-bk">➕ Tambah Transaksi Baru</button>
+        <button class="btn btn-primary btn-sm" id="btn-tambah-bk">âž• Tambah Transaksi Baru</button>
         <span style="font-size:var(--font-size-xs);color:var(--color-text-muted)">
           Saldo Awal Bulan: <strong>${fRp(saldoAwal)}</strong>
         </span>
@@ -575,16 +575,16 @@ function _renderBukuKas() {
       <!-- Edit form slot -->
       <div id="bk-edit-slot"></div>
 
-      <p class="laporan-section-title">📒 Buku Kas — ${bulanLabel}</p>
+      <p class="laporan-section-title">ðŸ“’ Buku Kas â€” ${bulanLabel}</p>
 
       ${monthTxs.length === 0
-        ? '<div class="empty-state"><div class="empty-state-icon">📒</div><p class="empty-state-message">Belum ada transaksi bulan ini</p></div>'
+        ? '<div class="empty-state"><div class="empty-state-icon">ðŸ“’</div><p class="empty-state-message">Belum ada transaksi bulan ini</p></div>'
         : `<div style="overflow-x:auto">
             <table class="laporan-table" id="tabel-bukukas">
               <thead>
                 <tr>
                   <th>Tanggal</th><th>Keterangan</th><th>Lokasi</th>
-                  <th class="text-right">Debit (−)</th>
+                  <th class="text-right">Debit (âˆ’)</th>
                   <th class="text-right">Kredit (+)</th>
                   <th class="text-right">Saldo</th>
                   <th class="no-print text-center">Aksi</th>
@@ -592,7 +592,7 @@ function _renderBukuKas() {
               </thead>
               <tbody id="tbody-bukukas">
                 <tr style="font-style:italic;color:var(--color-text-muted)">
-                  <td>—</td><td colspan="4">Saldo Awal Bulan</td>
+                  <td>â€”</td><td colspan="4">Saldo Awal Bulan</td>
                   <td class="text-right ${saldoAwal>=0?'saldo-positif':'saldo-negatif'}">${fRp(saldoAwal)}</td>
                   <td class="no-print"></td>
                 </tr>
@@ -606,7 +606,7 @@ function _renderBukuKas() {
     </div>`;
 }
 
-// ── Buku Kas edit form HTML ──────────────────────────────────────────────────
+// â”€â”€ Buku Kas edit form HTML â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function _buildBkEditFormHTML(tx) {
   const OPTS = [
@@ -620,7 +620,7 @@ function _buildBkEditFormHTML(tx) {
 
   return `
     <div class="inline-edit-form" id="bk-edit-card">
-      <h4>✏️ ${tx.id ? 'Edit' : 'Tambah'} Transaksi</h4>
+      <h4>âœï¸ ${tx.id ? 'Edit' : 'Tambah'} Transaksi</h4>
       <div class="form-group">
         <label class="form-label" for="bk-jenis">Jenis</label>
         <select class="form-control" id="bk-jenis">${opts}</select>
@@ -645,19 +645,19 @@ function _buildBkEditFormHTML(tx) {
         <input class="form-control" type="number" id="bk-nominal" min="1" max="999999999999" value="${tx.nominal||''}">
       </div>
       <div class="inline-edit-actions">
-        <button class="btn btn-primary" id="bk-save">💾 Simpan</button>
+        <button class="btn btn-primary" id="bk-save">ðŸ’¾ Simpan</button>
         <button class="btn btn-outline"  id="bk-cancel">Batal</button>
       </div>
     </div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TAB 6 — CETAK
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// TAB 6 â€” CETAK
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function _renderCetak() {
   return `
-    <p class="laporan-section-title">🖨️ Pratinjau &amp; Cetak Laporan</p>
+    <p class="laporan-section-title">ðŸ–¨ï¸ Pratinjau &amp; Cetak Laporan</p>
     <p style="color:var(--color-text-muted);font-size:var(--font-size-sm);margin-bottom:var(--space-5)">
       Pilih laporan yang ingin dicetak, lalu klik tombol Cetak. 
       Halaman akan membuka dialog cetak browser. Pilih "Simpan sebagai PDF" untuk menyimpan file.
@@ -665,11 +665,11 @@ function _renderCetak() {
 
     <div style="display:grid;gap:var(--space-3)">
       ${[
-        { tab: 'labarugi', label: '📊 Laba Rugi',             desc: 'Tabel pendapatan, beban, dan laba bersih' },
-        { tab: 'aruskas',  label: '💸 Arus Kas',              desc: 'Pergerakan kas masuk/keluar + saldo berjalan' },
-        { tab: 'neraca',   label: '⚖️ Neraca',                desc: 'Posisi aset, kewajiban, dan modal' },
-        { tab: 'calk',     label: '📝 CALK',                  desc: 'Catatan atas Laporan Keuangan' },
-        { tab: 'bukukas',  label: '📒 Buku Kas',              desc: 'Semua transaksi dengan saldo berjalan' },
+        { tab: 'labarugi', label: 'ðŸ“Š Laba Rugi',             desc: 'Tabel pendapatan, beban, dan laba bersih' },
+        { tab: 'aruskas',  label: 'ðŸ’¸ Arus Kas',              desc: 'Pergerakan kas masuk/keluar + saldo berjalan' },
+        { tab: 'neraca',   label: 'âš–ï¸ Neraca',                desc: 'Posisi aset, kewajiban, dan modal' },
+        { tab: 'calk',     label: 'ðŸ“ CALK',                  desc: 'Catatan atas Laporan Keuangan' },
+        { tab: 'bukukas',  label: 'ðŸ“’ Buku Kas',              desc: 'Semua transaksi dengan saldo berjalan' },
       ].map(item => `
         <div style="display:flex;align-items:center;justify-content:space-between;
                     background:var(--color-bg);border:1px solid var(--color-border);
@@ -679,19 +679,19 @@ function _renderCetak() {
             <p style="font-size:var(--font-size-xs);color:var(--color-text-muted)">${item.desc}</p>
           </div>
           <button class="btn btn-primary btn-sm btn-goto-print" data-tab="${item.tab}"
-                  style="flex-shrink:0">🖨️ Cetak</button>
+                  style="flex-shrink:0">ðŸ–¨ï¸ Cetak</button>
         </div>`).join('')}
     </div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ATTACH LISTENERS — main entry point
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ATTACH LISTENERS â€” main entry point
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export function attachListeners(params = {}) {
   _activeTab = params.tab ?? _activeTab;
 
-  // ── Tab switching ────────────────────────────────────────────
+  // â”€â”€ Tab switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   document.querySelectorAll('.laporan-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       _activeTab = btn.getAttribute('data-tab');
@@ -713,7 +713,7 @@ export function attachListeners(params = {}) {
   _attachPanelListeners(_activeTab);
 }
 
-// ─── Panel-specific listeners ─────────────────────────────────────────────────
+// â”€â”€â”€ Panel-specific listeners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function _attachPanelListeners(tab) {
   switch (tab) {
@@ -726,7 +726,7 @@ function _attachPanelListeners(tab) {
   }
 }
 
-// ─── Shared: month nav helper ─────────────────────────────────────────────────
+// â”€â”€â”€ Shared: month nav helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function _attachMonthNav(prefix, getYear, getMonth, setYear, setMonth, onRefresh) {
   const prevBtn = document.getElementById(`${prefix}-prev`);
@@ -755,17 +755,44 @@ function _attachMonthNav(prefix, getYear, getMonth, setYear, setMonth, onRefresh
   });
 }
 
-// ─── Shared: print trigger ────────────────────────────────────────────────────
+// â”€â”€â”€ Shared: print trigger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function _triggerPrint(printAreaId) {
-  // Temporarily mark the correct print area
-  document.querySelectorAll('.laporan-print-area').forEach(el => el.classList.remove('active-print'));
   const area = document.getElementById(printAreaId);
-  if (area) area.classList.add('active-print');
+  if (!area) { console.warn('[Print] Area not found:', printAreaId); return; }
+
+  // Remove stale portal
+  let portal = document.getElementById('print-portal');
+  if (portal) portal.remove();
+
+  // Build fresh portal at <body> level (top-level, outside app-shell)
+  portal = document.createElement('div');
+  portal.id = 'print-portal';
+  portal.style.cssText = 'display:none;font-family:Segoe UI,Arial,sans-serif;font-size:11pt;color:#000;background:#fff;padding:1cm;';
+  portal.innerHTML = area.innerHTML;
+
+  // Make print-only sections visible inside portal
+  portal.querySelectorAll('.print-only').forEach(el => { el.style.display = 'block'; });
+  // Hide screen-only UI chrome inside portal
+  portal.querySelectorAll('.no-print,.laporan-tabs,.laporan-toolbar,.month-nav').forEach(el => { el.style.display = 'none'; });
+  portal.querySelectorAll('button,.btn,.welcome-card').forEach(el => { el.style.display = 'none'; });
+
+  document.body.appendChild(portal);
+  document.body.classList.add('is-printing');
+
+  // Clean up after print dialog closes
+  const cleanup = () => {
+    document.body.classList.remove('is-printing');
+    const p = document.getElementById('print-portal');
+    if (p) p.remove();
+    window.removeEventListener('afterprint', cleanup);
+  };
+  window.addEventListener('afterprint', cleanup);
+
   window.print();
 }
 
-// ─── Shared: Excel export ─────────────────────────────────────────────────────
+// â”€â”€â”€ Shared: Excel export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function _exportExcel(rows, sheetName, fileName) {
   if (typeof window === 'undefined' || typeof window.XLSX === 'undefined') {
@@ -784,7 +811,7 @@ function _todayStr() {
   return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
 }
 
-// ─── Tab 1: Laba Rugi listeners ───────────────────────────────────────────────
+// â”€â”€â”€ Tab 1: Laba Rugi listeners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function _listenLabarugi() {
   _attachMonthNav('lr',
@@ -809,7 +836,7 @@ function _listenLabarugi() {
     const { laporan, penjualanLain, totalPendapatan, laba, margin } = _calcLabarugi(_lrYear, _lrMonth);
     const bl = `${_BULAN_NAMA[_lrMonth]}-${_lrYear}`;
     _exportExcel([
-      ['BUMKam Torei Natei — Laporan Laba Rugi', '', ''],
+      ['BUMKam Torei Natei â€” Laporan Laba Rugi', '', ''],
       ['Periode', bl, ''],
       [''],
       ['Keterangan', 'Jumlah (Rp)', ''],
@@ -824,7 +851,7 @@ function _listenLabarugi() {
   });
 }
 
-// ─── Tab 2: Arus Kas listeners ────────────────────────────────────────────────
+// â”€â”€â”€ Tab 2: Arus Kas listeners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function _listenArusKas() {
   _attachMonthNav('ak',
@@ -847,11 +874,11 @@ function _listenArusKas() {
     const bl        = `${_BULAN_NAMA[_akMonth]}-${_akYear}`;
 
     const rows = [
-      ['BUMKam Torei Natei — Laporan Arus Kas', '','','','',''],
+      ['BUMKam Torei Natei â€” Laporan Arus Kas', '','','','',''],
       ['Periode', bl,'','','',''],
       [''],
       ['Tanggal','Keterangan','Lokasi','Kas Masuk','Kas Keluar','Saldo'],
-      ['—','Saldo Awal','','','',saldo],
+      ['â€”','Saldo Awal','','','',saldo],
     ];
     monthTxs.forEach(t => {
       const inc = isIncome(t.jenis) ? t.nominal : 0;
@@ -863,7 +890,7 @@ function _listenArusKas() {
   });
 }
 
-// ─── Tab 3: Neraca listeners ──────────────────────────────────────────────────
+// â”€â”€â”€ Tab 3: Neraca listeners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function _listenNeraca() {
   _attachMonthNav('ne',
@@ -889,7 +916,7 @@ function _listenNeraca() {
     const modal      = totalAset;
     const bl         = `${_BULAN_NAMA[_neMonth]}-${_neYear}`;
     _exportExcel([
-      ['BUMKam Torei Natei — Neraca',''],
+      ['BUMKam Torei Natei â€” Neraca',''],
       ['Per akhir', bl],[''],
       ['Pos','Jumlah (Rp)'],
       ['Kas & Setara Kas', kas],
@@ -901,7 +928,7 @@ function _listenNeraca() {
   });
 }
 
-// ─── Tab 4: CALK listeners ────────────────────────────────────────────────────
+// â”€â”€â”€ Tab 4: CALK listeners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function _listenCalk() {
   _attachMonthNav('calk',
@@ -916,11 +943,11 @@ function _listenCalk() {
   document.getElementById('btn-cetak-calk')?.addEventListener('click', () => _triggerPrint('print-area-calk'));
 
   document.getElementById('btn-export-excel-calk')?.addEventListener('click', () => {
-    showNotification('CALK berformat narasi — gunakan Cetak untuk menyimpan sebagai PDF.', 'info', 4000);
+    showNotification('CALK berformat narasi â€” gunakan Cetak untuk menyimpan sebagai PDF.', 'info', 4000);
   });
 }
 
-// ─── Tab 5: Buku Kas listeners ────────────────────────────────────────────────
+// â”€â”€â”€ Tab 5: Buku Kas listeners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function _listenBukuKas() {
   _attachMonthNav('bk',
@@ -942,10 +969,10 @@ function _listenBukuKas() {
     const monthTxs = txs.filter(t => t.tanggal.startsWith(pfx));
     const bl       = `${_BULAN_NAMA[_bkMonth]}-${_bkYear}`;
     const rows = [
-      ['BUMKam Torei Natei — Buku Kas','','','','',''],
+      ['BUMKam Torei Natei â€” Buku Kas','','','','',''],
       ['Periode', bl,'','','',''],[''],
-      ['Tanggal','Keterangan','Lokasi','Debit (−)','Kredit (+)','Saldo'],
-      ['—','Saldo Awal','','','',saldo],
+      ['Tanggal','Keterangan','Lokasi','Debit (âˆ’)','Kredit (+)','Saldo'],
+      ['â€”','Saldo Awal','','','',saldo],
     ];
     monthTxs.forEach(t => {
       const d = isIncome(t.jenis)?0:t.nominal;
@@ -1014,7 +1041,7 @@ function _closeBkForm() {
 }
 
 function _attachBkFormListeners(originalTx) {
-  // Jenis change → toggle keterangan
+  // Jenis change â†’ toggle keterangan
   document.getElementById('bk-jenis')?.addEventListener('change', (e) => {
     const jenis    = e.target.value;
     const group    = document.getElementById('bk-group-ket');
@@ -1062,7 +1089,7 @@ function _attachBkFormListeners(originalTx) {
   });
 }
 
-// ─── Tab 6: Cetak listeners ───────────────────────────────────────────────────
+// â”€â”€â”€ Tab 6: Cetak listeners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function _listenCetak() {
   document.querySelectorAll('.btn-goto-print').forEach(btn => {

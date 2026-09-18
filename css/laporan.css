@@ -1,9 +1,9 @@
 /* ============================================================
-   laporan.css — Modul Laporan Keuangan SIKAT
+   laporan.css â€” Modul Laporan Keuangan SIKAT
    Tab nav, sub-view tables, print preview
    ============================================================ */
 
-/* ── Tab Navigation ─────────────────────────────────────────────────────── */
+/* â”€â”€ Tab Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .laporan-tabs {
   display: flex;
@@ -41,7 +41,7 @@
   color: var(--color-navy);
 }
 
-/* ── Tab panel wrapper ───────────────────────────────────────────────────── */
+/* â”€â”€ Tab panel wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .laporan-panel-wrap {
   background: var(--color-surface);
@@ -53,7 +53,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* ── Shared table ────────────────────────────────────────────────────────── */
+/* â”€â”€ Shared table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .laporan-table {
   width: 100%;
@@ -98,7 +98,7 @@
   background: rgba(241,245,249,0.5);
 }
 
-/* ── Section heading inside panel ───────────────────────────────────────── */
+/* â”€â”€ Section heading inside panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .laporan-section-title {
   font-size: var(--font-size-base);
@@ -112,9 +112,9 @@
   gap: var(--space-2);
 }
 
-/* ── Month navigator (reuses .month-nav from components.css) ─────────────── */
+/* â”€â”€ Month navigator (reuses .month-nav from components.css) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-/* ── Neraca boxes ────────────────────────────────────────────────────────── */
+/* â”€â”€ Neraca boxes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .neraca-grid {
   display: grid;
@@ -153,7 +153,7 @@
   margin-top: var(--space-1);
 }
 
-/* ── CALK narrative ──────────────────────────────────────────────────────── */
+/* â”€â”€ CALK narrative â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .calk-list {
   list-style: none;
@@ -185,7 +185,7 @@
 }
 .calk-item-text strong { color: var(--color-navy); }
 
-/* ── Toolbar (print button + export) ────────────────────────────────────── */
+/* â”€â”€ Toolbar (print button + export) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .laporan-toolbar {
   display: flex;
@@ -201,7 +201,7 @@
   flex-wrap: wrap;
 }
 
-/* ── Signature row ───────────────────────────────────────────────────────── */
+/* â”€â”€ Signature row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 .tanda-tangan-grid {
   display: grid;
@@ -228,7 +228,7 @@
   font-weight: 600;
 }
 
-/* ── Buku Kas row actions ────────────────────────────────────────────────── */
+/* â”€â”€ Buku Kas row actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .buku-kas-actions {
   display: flex;
   gap: var(--space-1);
@@ -237,41 +237,71 @@
 
 /* ════════════════════════════════════════════════════════════════
    PRINT STYLES
+   Uses a #print-portal div placed at <body> level by JS.
+   The app shell is hidden; only the portal content prints.
    ════════════════════════════════════════════════════════════════ */
 
-@media print {
-  /* Hide everything except the print-area */
-  body > *:not(#app-shell) { display: none !important; }
-  #app-shell > *:not(#body-shell) { display: none !important; }
-  #body-shell > *:not(#view-container) { display: none !important; }
-  #view-container > *:not(.laporan-print-area) { display: none !important; }
+/* Screen: hide print-only elements normally */
+.print-only { display: none; }
 
-  .laporan-print-area {
-    display: block !important;
-    position: static;
-    width: 100%;
-    font-size: 11pt;
-    color: #000;
+/* When JS adds .is-printing to <body>, hide the live app and show portal */
+body.is-printing > #app-shell,
+body.is-printing > #notification-container {
+  display: none !important;
+}
+
+body.is-printing > #print-portal {
+  display: block !important;
+}
+
+/* The portal itself (created by JS, normally hidden) */
+#print-portal {
+  display: none;
+}
+
+@media print {
+  /* Hide the live app shell — only portal prints */
+  body > #app-shell,
+  body > #notification-container,
+  body > #splash-screen {
+    display: none !important;
   }
 
-  .laporan-tabs,
-  .laporan-toolbar,
-  .month-nav,
-  .laporan-tab-btn,
-  .btn,
-  button,
-  .welcome-card,
-  .no-print { display: none !important; }
-
-  .laporan-panel-wrap {
-    border: none;
-    box-shadow: none;
+  /* Show the portal */
+  body > #print-portal {
+    display: block !important;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    color: #000;
+    background: #fff;
+    width: 100%;
     padding: 0;
   }
 
-  .laporan-table th,
-  .laporan-table td { padding: 4pt 6pt; }
+  /* Clean up panel wrapper */
+  #print-portal .laporan-panel-wrap {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
 
+  /* Hide interactive chrome inside portal */
+  #print-portal .laporan-tabs,
+  #print-portal .laporan-toolbar,
+  #print-portal .month-nav,
+  #print-portal .btn,
+  #print-portal button,
+  #print-portal .welcome-card,
+  #print-portal .no-print { display: none !important; }
+
+  /* Show print-only sections */
+  #print-portal .print-only { display: block !important; }
+
+  /* Table padding for print */
+  #print-portal .laporan-table th,
+  #print-portal .laporan-table td { padding: 4pt 6pt; }
+
+  /* KOP surat */
   .print-kop {
     text-align: center;
     margin-bottom: 16pt;
@@ -282,10 +312,5 @@
   .print-kop h3 { font-size: 12pt; font-weight: 600; margin: 0 0 2pt; }
   .print-kop p  { font-size: 10pt; margin: 0; }
 
-  .print-only { display: block !important; }
-
   @page { margin: 1.5cm; }
 }
-
-/* Hide print-only elements on screen */
-.print-only { display: none; }

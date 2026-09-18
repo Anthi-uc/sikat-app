@@ -4,17 +4,15 @@
 
 /* ── CSS Custom Properties ── */
 :root {
-  /* ── Brand Colors ── */
-  --color-navy:          #1e293b;   /* Deep Navy — sidebar, header */
+  --color-navy:          #1e293b;
   --color-navy-dark:     #0f172a;
-  --color-navy-mid:      #334155;   /* hover item sidebar */
-  --color-teal:          #0d9488;   /* Teal/Emerald — aksen utama */
+  --color-navy-mid:      #334155;
+  --color-teal:          #0d9488;
   --color-teal-dark:     #0f766e;
   --color-teal-light:    #ccfbf1;
-  --color-citrine:       #eab308;   /* Citrine Yellow — highlight */
+  --color-citrine:       #eab308;
   --color-citrine-light: #fef9c3;
 
-  /* ── Semantic aliases (banyak komponen masih pakai var(--color-primary)) ── */
   --color-primary:       var(--color-teal);
   --color-primary-dark:  var(--color-teal-dark);
   --color-primary-light: var(--color-teal-light);
@@ -29,7 +27,6 @@
   --color-bg:            #f1f5f9;
   --color-surface:       #ffffff;
 
-  /* ── Typography ── */
   --font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-size-xs:   0.75rem;
   --font-size-sm:   0.875rem;
@@ -40,7 +37,6 @@
   --font-size-3xl:  1.875rem;
   --font-size-4xl:  2.25rem;
 
-  /* ── Spacing ── */
   --space-1:  0.25rem;
   --space-2:  0.5rem;
   --space-3:  0.75rem;
@@ -51,19 +47,16 @@
   --space-10: 2.5rem;
   --space-12: 3rem;
 
-  /* ── Border Radius (konsisten & rounded) ── */
   --radius-sm:   6px;
   --radius-md:   10px;
   --radius-lg:   14px;
   --radius-xl:   20px;
   --radius-full: 9999px;
 
-  /* ── Shadows ── */
   --shadow-sm: 0 1px 4px rgba(0,0,0,0.07);
   --shadow-md: 0 2px 10px rgba(0,0,0,0.10);
   --shadow-lg: 0 4px 20px rgba(0,0,0,0.13);
 
-  /* ── Layout ── */
   --header-height:      60px;
   --sidebar-width:      240px;
   --bottom-nav-height:  60px;
@@ -73,11 +66,7 @@
 }
 
 /* ── Reset ── */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
   font-size: 16px;
@@ -95,28 +84,15 @@ body {
 }
 
 img, svg { max-width: 100%; display: block; }
-
 a { color: var(--color-teal); text-decoration: none; }
 a:hover { text-decoration: underline; }
-
 ul, ol { list-style: none; }
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-}
-
-input, select, textarea {
-  font-family: inherit;
-  font-size: inherit;
-}
-
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
 [hidden] { display: none !important; }
 
 /* ════════════════════════════════════════════════════
-   APP SHELL — Desktop sidebar layout
+   MOBILE LAYOUT (default — < 768px)
    ════════════════════════════════════════════════════ */
 
 #app-shell {
@@ -125,22 +101,17 @@ input, select, textarea {
   min-height: 100vh;
 }
 
-/* Mobile: stacked (header top, content, bottom-nav) */
 #header-container {
   position: sticky;
   top: 0;
   z-index: 200;
   background: var(--color-navy);
   height: var(--header-height);
-  /* shown on mobile, hidden on desktop */
+  flex-shrink: 0;
 }
 
-/* Sidebar — hidden on mobile, visible on desktop */
-#sidebar-container {
-  display: none;
-}
+#sidebar-container { display: none; }
 
-/* Main body area (sidebar + content) */
 #body-shell {
   display: flex;
   flex: 1;
@@ -151,16 +122,17 @@ input, select, textarea {
   flex: 1;
   padding: var(--space-4);
   min-width: 0;
+  overflow-x: hidden;
   padding-bottom: calc(var(--bottom-nav-height) + var(--space-4));
 }
 
 #footer-container {
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
-  display: none; /* footer hidden on mobile to save space */
+  display: none;
+  flex-shrink: 0;
 }
 
-/* ── Bottom Navigation (mobile only) ── */
 #bottom-nav {
   position: fixed;
   bottom: 0;
@@ -193,58 +165,72 @@ input, select, textarea {
   text-transform: uppercase;
   -webkit-tap-highlight-color: transparent;
 }
-
-.bottom-nav-item .bn-icon {
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
+.bottom-nav-item .bn-icon { font-size: 1.25rem; line-height: 1; }
 .bottom-nav-item.active,
-.bottom-nav-item:hover {
-  color: var(--color-citrine);
-}
+.bottom-nav-item:hover { color: var(--color-citrine); }
 
 /* ════════════════════════════════════════════════════
-   DESKTOP / TABLET — Sidebar layout (≥768px)
+   DESKTOP / TABLET — Sidebar layout (>= 768px)
    ════════════════════════════════════════════════════ */
 
 @media (min-width: 768px) {
-  /* Hide mobile header & bottom nav */
+
+  /* Switch to horizontal: sidebar | content-column */
+  #app-shell {
+    flex-direction: row;
+    align-items: stretch;
+    height: 100vh;
+    overflow: hidden;
+  }
+
   #header-container { display: none; }
   #bottom-nav       { display: none; }
 
-  /* Show sidebar */
+  /* ── Sidebar ── */
   #sidebar-container {
     display: flex;
     flex-direction: column;
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
+    flex-shrink: 0;
     background: var(--color-navy);
-    min-height: 100vh;
     position: sticky;
     top: 0;
     height: 100vh;
     overflow-y: auto;
-    flex-shrink: 0;
+    border-right: 1px solid rgba(255,255,255,0.06);
   }
 
-  /* Body shell becomes row */
+  /* The .sidebar div injected by JS must fill its container */
+  #sidebar-container > .sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    width: 100%;
+  }
+
+  /* ── Right-hand content column ── */
   #body-shell {
-    flex-direction: row;
-    align-items: flex-start;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    height: 100vh;
+    overflow-y: auto;
   }
 
   #view-container {
-    padding: var(--space-6) var(--space-6);
+    flex: 1;
+    padding: var(--space-6);
     padding-bottom: var(--space-8);
+    width: 100%;
     max-width: var(--max-content-width);
     margin: 0 auto;
-    flex: 1;
   }
 
   #footer-container {
     display: block;
-    /* sits below #body-shell */
+    flex-shrink: 0;
   }
 }
 
@@ -272,11 +258,7 @@ input, select, textarea {
   padding: var(--space-6);
 }
 
-/* SVG logo in splash */
-.splash-logo .logo-svg {
-  width: 72px;
-  height: 72px;
-}
+.splash-logo .logo-svg { width: 72px; height: 72px; }
 
 .splash-title {
   font-size: var(--font-size-4xl);
@@ -308,7 +290,5 @@ input, select, textarea {
 }
 
 @media (min-width: 768px) {
-  #notification-container {
-    top: var(--space-4);
-  }
+  #notification-container { top: var(--space-4); }
 }
