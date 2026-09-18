@@ -249,6 +249,39 @@ export const CalculationEngine = {
   },
 
   /**
+   * Ambil data produksi harian untuk setiap hari dalam bulan tertentu.
+   * Selalu mengembalikan tepat N titik data (N = jumlah hari dalam bulan),
+   * hari tanpa data = value 0.
+   * @param {Array} productions
+   * @param {number} year
+   * @param {number} month   0-indexed (0=Januari, 11=Desember)
+   * @returns {{ label: string, value: number, tanggal: string }[]}
+   */
+  getDataGrafikProduksiBulanan(productions, year, month) {
+    // Build lookup: tanggal → jumlahRak
+    const rakByDate = {};
+    if (productions && productions.length > 0) {
+      for (const p of productions) {
+        rakByDate[p.tanggal] = (rakByDate[p.tanggal] ?? 0) + p.jumlahRak;
+      }
+    }
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const result = [];
+    for (let day = 1; day <= daysInMonth; day++) {
+      const mm      = String(month + 1).padStart(2, '0');
+      const dd      = String(day).padStart(2, '0');
+      const dateStr = `${year}-${mm}-${dd}`;
+      result.push({
+        label:   `${dd}/${mm}`,
+        tanggal: dateStr,
+        value:   rakByDate[dateStr] ?? 0,
+      });
+    }
+    return result;
+  },
+
+  /**
    * Ambil data per minggu (ISO week) untuk maxMinggu minggu terakhir yang punya data.
    * Hanya minggu yang memiliki setidaknya satu transaksi yang dimasukkan.
    * @param {Array} transactions

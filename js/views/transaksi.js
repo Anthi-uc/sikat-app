@@ -1,4 +1,4 @@
-// transaksi.js — View Input Transaksi
+// transaksi.js — View Input Transaksi (kategori fleksibel: Biaya Lain + Penjualan Lain)
 
 import { StorageService, generateId, StorageError } from '../storage.js';
 import { Validator } from '../validator.js';
@@ -15,11 +15,23 @@ function formatRupiah(n) {
   return 'Rp ' + Number(n).toLocaleString('id-ID');
 }
 
-/** Get today's transaction summary from storage. */
+/** Jenis yang dianggap sebagai pemasukan */
+export function isIncome(jenis) {
+  return jenis === 'penjualan_telur' || jenis === 'penjualan_lain';
+}
+
+/** Jenis yang memerlukan jumlahRak (untuk auto-kurang stok telur) */
+function isEggSale(jenis) { return jenis === 'penjualan_telur'; }
+
+/** Jenis yang memerlukan field keterangan */
+function needsKeterangan(jenis) {
+  return jenis === 'biaya_lain' || jenis === 'penjualan_lain';
+}
+
 function getTodaySummary() {
   try {
     const today = getTodayStr();
-    const txs = StorageService.getTransactions().filter(t => t.tanggal === today);
+    const txs   = StorageService.getTransactions().filter(t => t.tanggal === today);
     const total = txs.reduce((s, t) => s + t.nominal, 0);
     return { count: txs.length, total };
   } catch {
@@ -27,21 +39,14 @@ function getTodaySummary() {
   }
 }
 
-// ─── render ───────────────────────────────────────────────────────────────────
+// ─── render ──────────────────────────────────────────────────────────────────
 
-/**
- * Render the Transaksi view HTML.
- * @param {{ prefillJenis?: string }} params
- * @returns {string}
- */
 export function render(params = {}) {
   const { count, total } = getTodaySummary();
   const prefillJenis = params.prefillJenis ?? '';
 
-  // Pre-select jenis option if prefillJenis is provided
-  const optionPenjualan = `<option value="penjualan_telur"${prefillJenis === 'penjualan_telur' ? ' selected' : ''}>Penjualan Telur</option>`;
-  const optionPakan     = `<option value="pembelian_pakan"${prefillJenis === 'pembelian_pakan' ? ' selected' : ''}>Pembelian Pakan</option>`;
-  const optionBiaya     = `<option value="biaya_lain"${prefillJenis === 'biaya_lain' ? ' selected' : ''}>Biaya Lain</option>`;
+  const opt = (val, lbl) =>
+    `<option value="${val}"${prefillJenis === val ? ' selected' : ''}>${lbl}</option>`;
 
   return `
     <div class="welcome-card">
@@ -58,14 +63,23 @@ export function render(params = {}) {
           <label class="form-label" for="jenis">Jenis Transaksi</label>
           <select class="form-control" id="jenis" name="jenis">
             <option value="">-- Pilih Jenis --</option>
-            ${optionPenjualan}
-            ${optionPakan}
-            ${optionBiaya}
+            ${opt('penjualan_telur', 'Penjualan Telur')}
+            ${opt('penjualan_lain',  'Penjualan Lain')}
+            ${opt('pembelian_pakan', 'Pembelian Pakan')}
+            ${opt('biaya_lain',      'Biaya Lain')}
           </select>
           <span class="form-error" id="err-jenis" hidden></span>
         </div>
 
-        <!-- Tanggal (default today) -->
+        <!-- Keterangan (tampil untuk biaya_lain & penjualan_lain) -->
+        <div class="form-group" id="group-keterangan" style="display:none">
+          <label class="form-label" for="keterangan" id="label-keterangan">Keterangan</label>
+          <input class="form-control" type="text" id="keterangan" name="keterangan"
+            placeholder="Contoh: Servis Kandang, Transportasi" maxlength="100">
+          <span class="form-error" id="err-keterangan" hidden></span>
+        </div>
+
+        <!-- Tanggal -->
         <div class="form-group">
           <label class="form-label" for="tanggal">Tanggal</label>
           <input class="form-control" type="date" id="tanggal" name="tanggal"
@@ -75,15 +89,15 @@ export function render(params = {}) {
 
         <!-- Lokasi -->
         <div class="form-group">
-          <label class="form-label" for="lokasi">Lokasi</label>
+          <label class="form-label" for="lokasi">Lokasi / Keterangan Tempat</label>
           <input class="form-control" type="text" id="lokasi" name="lokasi"
             placeholder="Pasar Sentani, Besum" maxlength="100">
           <span class="form-error" id="err-lokasi" hidden></span>
         </div>
 
-        <!-- Jumlah Rak (conditional — shown only for penjualan_telur) -->
+        <!-- Jumlah Rak (hanya untuk penjualan_telur) -->
         <div class="form-group" id="group-jumlah-rak">
-          <label class="form-label" for="jumlah-rak">Jumlah Rak</label>
+          <label class="form-label" for="jumlah-rak">Jumlah Rak Terjual</label>
           <input class="form-control" type="number" id="jumlah-rak" name="jumlahRak"
             min="1" max="9999" step="1" placeholder="Contoh: 25">
           <span class="form-error" id="err-jumlah-rak" hidden></span>
@@ -97,7 +111,7 @@ export function render(params = {}) {
           <span class="form-error" id="err-nominal" hidden></span>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-full">💾 Simpan</button>
+        <button type="submit" class="btn btn-primary btn-full">💾 Simpan Transaksi</button>
       </form>
     </div>
 
@@ -117,113 +131,143 @@ export function render(params = {}) {
 
 // ─── attachListeners ──────────────────────────────────────────────────────────
 
-/**
- * Attach all DOM event listeners for the Transaksi view.
- * @param {{ prefillJenis?: string }} params
- */
 export function attachListeners(params = {}) {
-  const form       = document.getElementById('form-transaksi');
-  const jenisEl    = document.getElementById('jenis');
-  const groupRak   = document.getElementById('group-jumlah-rak');
-  const jumlahRakEl = document.getElementById('jumlah-rak');
+  const form          = document.getElementById('form-transaksi');
+  const jenisEl       = document.getElementById('jenis');
+  const groupRak      = document.getElementById('group-jumlah-rak');
+  const groupKet      = document.getElementById('group-keterangan');
+  const labelKet      = document.getElementById('label-keterangan');
+  const jumlahRakEl   = document.getElementById('jumlah-rak');
+  const keteranganEl  = document.getElementById('keterangan');
 
-  if (!form || !jenisEl || !groupRak || !jumlahRakEl) return;
+  if (!form || !jenisEl || !groupRak || !groupKet) return;
 
-  // ── Helper: show field-level validation errors ──────────────────────────
+  // ── Error helpers ──────────────────────────────────────────────────────
+  const FIELD_MAP = {
+    jenis:      'err-jenis',
+    tanggal:    'err-tanggal',
+    lokasi:     'err-lokasi',
+    nominal:    'err-nominal',
+    jumlahRak:  'err-jumlah-rak',
+    keterangan: 'err-keterangan',
+  };
+
   function showFieldErrors(errors) {
-    const fieldMap = {
-      jenis:     'err-jenis',
-      tanggal:   'err-tanggal',
-      lokasi:    'err-lokasi',
-      nominal:   'err-nominal',
-      jumlahRak: 'err-jumlah-rak',
-    };
     Object.entries(errors).forEach(([field, msg]) => {
-      const errEl   = document.getElementById(fieldMap[field]);
-      const inputEl = document.getElementById(field === 'jumlahRak' ? 'jumlah-rak' : field);
-      if (errEl) { errEl.textContent = msg; errEl.removeAttribute('hidden'); }
-      if (inputEl) inputEl.classList.add('is-invalid');
+      const errEl   = document.getElementById(FIELD_MAP[field]);
+      const inputId = field === 'jumlahRak' ? 'jumlah-rak' : field;
+      const inputEl = document.getElementById(inputId);
+      if (errEl)   { errEl.textContent = msg; errEl.removeAttribute('hidden'); }
+      if (inputEl)  inputEl.classList.add('is-invalid');
     });
   }
 
   function clearFieldError(fieldId) {
-    const errId   = fieldId === 'jumlah-rak' ? 'err-jumlah-rak' : `err-${fieldId}`;
+    const errId   = FIELD_MAP[fieldId] ?? `err-${fieldId}`;
     const errEl   = document.getElementById(errId);
-    const inputEl = document.getElementById(fieldId);
-    if (errEl) { errEl.textContent = ''; errEl.setAttribute('hidden', ''); }
-    if (inputEl) inputEl.classList.remove('is-invalid');
+    const inputEl = document.getElementById(fieldId === 'jumlahRak' ? 'jumlah-rak' : fieldId);
+    if (errEl)   { errEl.textContent = ''; errEl.setAttribute('hidden', ''); }
+    if (inputEl)  inputEl.classList.remove('is-invalid');
   }
 
   function clearAllErrors() {
-    ['jenis', 'tanggal', 'lokasi', 'nominal', 'jumlah-rak'].forEach(clearFieldError);
+    Object.keys(FIELD_MAP).forEach(clearFieldError);
   }
 
+  // ── Update dependent fields on jenis change ────────────────────────────
+  function applyJenis(jenis) {
+    // Jumlah Rak: only for penjualan_telur
+    const showRak = isEggSale(jenis);
+    groupRak.style.display = showRak ? '' : 'none';
+    if (!showRak) { jumlahRakEl.value = ''; clearFieldError('jumlahRak'); }
+
+    // Keterangan: for biaya_lain and penjualan_lain
+    const showKet = needsKeterangan(jenis);
+    groupKet.style.display = showKet ? '' : 'none';
+    if (!showKet) { keteranganEl.value = ''; clearFieldError('keterangan'); }
+
+    if (labelKet) {
+      labelKet.textContent =
+        jenis === 'penjualan_lain' ? 'Nama / Jenis Penjualan' : 'Nama / Jenis Biaya';
+    }
+  }
+
+  // Hide rak by default (CSS had it hidden; we control via JS now)
+  groupRak.style.display = 'none';
+  groupKet.style.display = 'none';
+
+  jenisEl.addEventListener('change', () => applyJenis(jenisEl.value));
+
+  // Apply prefill
+  if (params.prefillJenis) {
+    jenisEl.value = params.prefillJenis;
+    applyJenis(params.prefillJenis);
+  }
+
+  // ── Ringkasan helpers ──────────────────────────────────────────────────
   function resetForm() {
-    document.getElementById('form-transaksi').reset();
-    // Re-set date to today after reset
+    form.reset();
     document.getElementById('tanggal').value = getTodayStr();
-    // Hide rak group
-    document.getElementById('group-jumlah-rak').classList.remove('visible');
+    groupRak.style.display = 'none';
+    groupKet.style.display = 'none';
     clearAllErrors();
   }
 
   function updateRingkasan() {
     const { count, total } = getTodaySummary();
-    const countEl = document.getElementById('stat-count');
-    const totalEl = document.getElementById('stat-total');
-    if (countEl) countEl.textContent = count;
-    if (totalEl) totalEl.textContent = formatRupiah(total);
+    const cEl = document.getElementById('stat-count');
+    const tEl = document.getElementById('stat-total');
+    if (cEl) cEl.textContent = count;
+    if (tEl) tEl.textContent = formatRupiah(total);
   }
 
-  // ── 1. Jenis dropdown → show/hide Jumlah Rak ───────────────────────────
-  jenisEl.addEventListener('change', () => {
-    if (jenisEl.value === 'penjualan_telur') {
-      groupRak.classList.add('visible');
-    } else {
-      groupRak.classList.remove('visible');
-      jumlahRakEl.value = '';
-      clearFieldError('jumlah-rak');
-    }
-  });
-
-  // Apply prefill after attaching the change listener
-  if (params.prefillJenis) {
-    jenisEl.value = params.prefillJenis;
-    jenisEl.dispatchEvent(new Event('change'));
-  }
-
-  // ── 2. Form submit ──────────────────────────────────────────────────────
+  // ── Form submit ────────────────────────────────────────────────────────
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     clearAllErrors();
 
-    const data = {
-      jenis:     jenisEl.value,
-      tanggal:   document.getElementById('tanggal').value,
-      lokasi:    document.getElementById('lokasi').value.trim(),
-      nominal:   document.getElementById('nominal').value,
-      jumlahRak: jenisEl.value === 'penjualan_telur'
-        ? document.getElementById('jumlah-rak').value
-        : undefined,
-    };
+    const jenis      = jenisEl.value;
+    const tanggal    = document.getElementById('tanggal').value;
+    const lokasi     = document.getElementById('lokasi').value.trim();
+    const nominal    = document.getElementById('nominal').value;
+    const keterangan = keteranganEl.value.trim();
 
+    // Build validation data
+    const data = { jenis, tanggal, lokasi, nominal,
+      jumlahRak: isEggSale(jenis) ? jumlahRakEl.value : undefined };
+
+    // Validate core fields via Validator
     const { valid, errors } = Validator.validateTransaksi(data);
-    if (!valid) {
+
+    // Extra: keterangan required for biaya_lain and penjualan_lain
+    if (needsKeterangan(jenis) && !keterangan) {
+      errors.keterangan = 'Keterangan wajib diisi.';
+    }
+
+    if (!valid || errors.keterangan) {
       showFieldErrors(errors);
       return;
     }
 
+    const { isiPerRak } = StorageService.getSettings();
+
     // Build transaction object
     const tx = {
       id:        generateId(),
-      jenis:     data.jenis,
-      tanggal:   data.tanggal,
-      lokasi:    data.lokasi,
-      nominal:   Number(data.nominal),
+      jenis,
+      tanggal,
+      lokasi,
+      nominal:   Number(nominal),
       createdAt: new Date().toISOString(),
     };
-    if (data.jenis === 'penjualan_telur') {
-      tx.jumlahRak = Number(data.jumlahRak);
+
+    if (isEggSale(jenis)) {
+      tx.jumlahRak   = Number(jumlahRakEl.value);
+      tx.jumlahButir = tx.jumlahRak * isiPerRak;
+    }
+
+    if (needsKeterangan(jenis)) {
+      tx.keterangan = keterangan;
     }
 
     try {

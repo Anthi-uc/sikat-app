@@ -43,11 +43,11 @@ export const ChartManager = {
         datasets: [{
           label: 'Produksi (Rak)',
           data: data.map(d => d.value),
-          borderColor: '#16a34a',
-          backgroundColor: 'rgba(22, 163, 74, 0.1)',
+          borderColor: '#0d9488',
+          backgroundColor: 'rgba(13,148,136,0.1)',
           borderWidth: 2,
-          pointBackgroundColor: '#16a34a',
-          pointRadius: 4,
+          pointBackgroundColor: '#0d9488',
+          pointRadius: 3,
           tension: 0.3,
           fill: true,
         }],
@@ -63,6 +63,12 @@ export const ChartManager = {
           y: {
             beginAtZero: true,
             ticks: { precision: 0 },
+          },
+          x: {
+            ticks: {
+              maxTicksLimit: 10,
+              maxRotation: 0,
+            },
           },
         },
       },
@@ -98,10 +104,10 @@ export const ChartManager = {
           {
             label: 'Penjualan Telur',
             data: data.map(d => d.penjualan),
-            borderColor: '#16a34a',
-            backgroundColor: 'rgba(22, 163, 74, 0.08)',
+            borderColor: '#0d9488',
+            backgroundColor: 'rgba(13,148,136,0.08)',
             borderWidth: 2,
-            pointBackgroundColor: '#16a34a',
+            pointBackgroundColor: '#0d9488',
             pointRadius: 4,
             tension: 0.3,
             fill: false,
