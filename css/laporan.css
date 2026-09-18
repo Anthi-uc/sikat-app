@@ -1,0 +1,291 @@
+/* ============================================================
+   laporan.css — Modul Laporan Keuangan SIKAT
+   Tab nav, sub-view tables, print preview
+   ============================================================ */
+
+/* ── Tab Navigation ─────────────────────────────────────────────────────── */
+
+.laporan-tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--color-navy);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: var(--space-2) var(--space-2) 0;
+  margin-bottom: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.laporan-tabs::-webkit-scrollbar { display: none; }
+
+.laporan-tab-btn {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.65);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+  font-family: inherit;
+}
+.laporan-tab-btn:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+.laporan-tab-btn.active {
+  background: var(--color-surface);
+  color: var(--color-navy);
+}
+
+/* ── Tab panel wrapper ───────────────────────────────────────────────────── */
+
+.laporan-panel-wrap {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Shared table ────────────────────────────────────────────────────────── */
+
+.laporan-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-4);
+}
+.laporan-table th,
+.laporan-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: middle;
+}
+.laporan-table th {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  white-space: nowrap;
+}
+.laporan-table td:not(:first-child) { white-space: nowrap; }
+.laporan-table tr:last-child td { border-bottom: none; }
+.laporan-table .row-total td {
+  font-weight: 700;
+  border-top: 2px solid var(--color-border);
+  border-bottom: none;
+  padding-top: var(--space-3);
+}
+.laporan-table .text-right { text-align: right; }
+.laporan-table .text-center { text-align: center; }
+
+.laporan-table .debit  { color: var(--color-danger); font-weight: 600; }
+.laporan-table .kredit { color: var(--color-teal);   font-weight: 600; }
+.laporan-table .saldo-positif { color: var(--color-teal); }
+.laporan-table .saldo-negatif { color: var(--color-danger); }
+
+/* Zebra stripe */
+.laporan-table tbody tr:nth-child(even) td {
+  background: rgba(241,245,249,0.5);
+}
+
+/* ── Section heading inside panel ───────────────────────────────────────── */
+
+.laporan-section-title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-navy);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 2px solid var(--color-teal);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── Month navigator (reuses .month-nav from components.css) ─────────────── */
+
+/* ── Neraca boxes ────────────────────────────────────────────────────────── */
+
+.neraca-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+@media (max-width: 520px) { .neraca-grid { grid-template-columns: 1fr; } }
+
+.neraca-box {
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+}
+.neraca-box-aset    { background: var(--color-teal-light); }
+.neraca-box-kewajiban { background: var(--color-danger-light); }
+.neraca-box-modal   { background: var(--color-citrine-light); }
+
+.neraca-box-label {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+.neraca-box-amount {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--color-navy);
+  line-height: 1.1;
+}
+.neraca-box-sub {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+/* ── CALK narrative ──────────────────────────────────────────────────────── */
+
+.calk-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.calk-item {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+.calk-item:last-child { border-bottom: none; }
+.calk-item-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  background: var(--color-teal);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+.calk-item-text strong { color: var(--color-navy); }
+
+/* ── Toolbar (print button + export) ────────────────────────────────────── */
+
+.laporan-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.laporan-toolbar-right {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* ── Signature row ───────────────────────────────────────────────────────── */
+
+.tanda-tangan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+}
+@media (max-width: 480px) { .tanda-tangan-grid { grid-template-columns: 1fr; } }
+
+.tanda-tangan-box {
+  text-align: center;
+  font-size: var(--font-size-sm);
+}
+.tanda-tangan-box .ttd-label {
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+.tanda-tangan-box .ttd-space {
+  height: 60px;
+  border-bottom: 1px solid var(--color-text);
+  margin-bottom: var(--space-1);
+}
+.tanda-tangan-box .ttd-name {
+  font-weight: 600;
+}
+
+/* ── Buku Kas row actions ────────────────────────────────────────────────── */
+.buku-kas-actions {
+  display: flex;
+  gap: var(--space-1);
+  justify-content: center;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PRINT STYLES
+   ════════════════════════════════════════════════════════════════ */
+
+@media print {
+  /* Hide everything except the print-area */
+  body > *:not(#app-shell) { display: none !important; }
+  #app-shell > *:not(#body-shell) { display: none !important; }
+  #body-shell > *:not(#view-container) { display: none !important; }
+  #view-container > *:not(.laporan-print-area) { display: none !important; }
+
+  .laporan-print-area {
+    display: block !important;
+    position: static;
+    width: 100%;
+    font-size: 11pt;
+    color: #000;
+  }
+
+  .laporan-tabs,
+  .laporan-toolbar,
+  .month-nav,
+  .laporan-tab-btn,
+  .btn,
+  button,
+  .welcome-card,
+  .no-print { display: none !important; }
+
+  .laporan-panel-wrap {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .laporan-table th,
+  .laporan-table td { padding: 4pt 6pt; }
+
+  .print-kop {
+    text-align: center;
+    margin-bottom: 16pt;
+    border-bottom: 2pt solid #000;
+    padding-bottom: 8pt;
+  }
+  .print-kop h2 { font-size: 14pt; font-weight: 700; margin: 0 0 2pt; }
+  .print-kop h3 { font-size: 12pt; font-weight: 600; margin: 0 0 2pt; }
+  .print-kop p  { font-size: 10pt; margin: 0; }
+
+  .print-only { display: block !important; }
+
+  @page { margin: 1.5cm; }
+}
+
+/* Hide print-only elements on screen */
+.print-only { display: none; }
