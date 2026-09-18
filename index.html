@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#16a34a">
+  <meta name="theme-color" content="#1e293b">
   <meta name="description" content="Sistem Informasi Kas Ayam Ternak — BUMKam Torei Natei">
   <title>SIKAT — BUMKam Torei Natei</title>
 
   <!-- PWA manifest -->
   <link rel="manifest" href="manifest.json">
 
-  <!-- Favicons (files don't exist yet — just add the tags) -->
+  <!-- Favicon: inline SVG logo "S" Teal + Citrine Yellow -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e293b'/%3E%3Cpath d='M42 18c0-4.4-3.6-8-8-8h-8c-4.4 0-8 3.6-8 8 0 3.2 1.9 6 4.8 7.4L34 30c1.4.7 2 1.7 2 3s-.6 2.4-2 3l-10 5c-2 1-3 2.8-3 4.8C21 50.2 24.8 54 29.3 54H38c4.4 0 8-3.6 8-8' stroke='%230d9488' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='46' cy='46' r='5' fill='%23eab308'/%3E%3C/svg%3E" type="image/svg+xml">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/icon-16.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
@@ -25,7 +26,12 @@
   <!-- Splash Screen (shown first, hidden after 1–2s) -->
   <div id="splash-screen" aria-live="polite">
     <div class="splash-logo">
-      <div class="logo-icon" aria-hidden="true"></div>
+      <!-- Logo "S" minimalis: Teal S shape + Citrine Yellow accent dot -->
+      <svg class="logo-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="80" height="80" rx="18" fill="#0f172a"/>
+        <path d="M54 22c0-5.5-4.5-10-10-10H30c-5.5 0-10 4.5-10 10 0 4 2.4 7.5 6 9.2l12.5 6.3c1.7.85 2.5 2.1 2.5 3.75S39.7 44 38 44.8L25.5 51.2C23.5 52.2 22 54.5 22 57c0 5.5 4.5 10 10.3 10H50c5.5 0 10-4.5 10-10" stroke="#0d9488" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="57" cy="57" r="6" fill="#eab308"/>
+      </svg>
       <h1 class="splash-title">SIKAT</h1>
       <p class="splash-subtitle">Sistem Informasi Kas Ayam Ternak</p>
       <p class="splash-org">BUMKam Torei Natei • Kampung Yakonde</p>
@@ -34,24 +40,35 @@
 
   <!-- App Shell (hidden until splash finishes) -->
   <div id="app-shell" hidden>
+
+    <!-- Mobile top header (hidden on desktop via CSS) -->
     <header id="header-container" role="banner"></header>
 
-    <main id="view-container" role="main" tabindex="-1"></main>
+    <!-- Body: sidebar + content -->
+    <div id="body-shell">
+      <!-- Desktop sidebar (hidden on mobile via CSS) -->
+      <nav id="sidebar-container" role="navigation" aria-label="Navigasi utama"></nav>
+
+      <!-- Page content -->
+      <main id="view-container" role="main" tabindex="-1"></main>
+    </div>
 
     <footer id="footer-container" role="contentinfo"></footer>
+
+    <!-- Mobile bottom navigation (hidden on desktop via CSS) -->
+    <nav id="bottom-nav" role="navigation" aria-label="Navigasi bawah"></nav>
   </div>
 
-  <!-- Notification container (rendered by app.js) -->
+  <!-- Notification container -->
   <div id="notification-container" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Chart.js from CDN (cached by service worker) -->
+  <!-- Chart.js from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 
-  <!-- SheetJS (xlsx) for Excel export — cached by service worker -->
+  <!-- SheetJS (xlsx) for Excel export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  <!-- App modules — order matters for ES module loading -->
-  <!-- Use type="module" so ES module imports work natively -->
+  <!-- App entry point -->
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

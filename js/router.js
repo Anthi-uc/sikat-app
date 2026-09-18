@@ -13,6 +13,7 @@ import { render as renderVersi, attachListeners as attachListenersVersi } from '
 import { render as renderLogin, attachListeners as attachListenersLogin } from './views/login.js';
 import { render as renderRegister, attachListeners as attachListenersRegister } from './views/register.js';
 import { AuthService } from './auth.js';
+import { setSidebarActive, setBottomNavActive } from './app.js';
 
 // ─── Route Maps ─────────────────────────────────────────────────────────────
 
@@ -123,6 +124,10 @@ export function navigate(hash, params = {}) {
   // Attach view-specific event listeners
   attachViewListeners(hash, params);
 
+  // Update active state in sidebar and bottom nav
+  setSidebarActive(hash);
+  setBottomNavActive(hash);
+
   // Scroll to top
   window.scrollTo(0, 0);
 }
@@ -154,5 +159,7 @@ window.addEventListener('popstate', (e) => {
     container.innerHTML = renderFn(params);
   }
   attachViewListeners(hash, params);
+  setSidebarActive(hash);
+  setBottomNavActive(hash);
   window.scrollTo(0, 0);
 });

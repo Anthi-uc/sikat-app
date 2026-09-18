@@ -33,29 +33,16 @@
 .menu-card:hover,
 .menu-card:focus-visible {
   box-shadow: var(--shadow-md);
-  border-color: var(--color-primary);
+  border-color: var(--color-teal);
   transform: translateY(-2px);
   outline: none;
 }
 
 .menu-card:active { transform: scale(0.97); }
 
-.menu-card-icon {
-  font-size: 2rem;
-  line-height: 1;
-}
-
-.menu-card-title {
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.menu-card-desc {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  line-height: 1.4;
-}
+.menu-card-icon  { font-size: 2rem; line-height: 1; }
+.menu-card-title { font-size: var(--font-size-sm); font-weight: 700; color: var(--color-text); }
+.menu-card-desc  { font-size: var(--font-size-xs); color: var(--color-text-muted); line-height: 1.4; }
 
 /* Aksi Cepat */
 .quick-actions {
@@ -64,10 +51,9 @@
   margin-bottom: var(--space-6);
   flex-wrap: wrap;
 }
-
 .quick-actions .btn { flex: 1; min-width: 140px; }
 
-/* Ringkasan Hari Ini — Home */
+/* Ringkasan Bulan Ini — Home */
 .summary-today {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -95,7 +81,7 @@
 .summary-today-value {
   font-size: var(--font-size-xl);
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-teal);
 }
 
 .summary-today-unit {
@@ -118,14 +104,8 @@
   margin-bottom: var(--space-6);
 }
 
-/* Jumlah Rak field hidden by default */
-#group-jumlah-rak {
-  display: none;
-}
-
-#group-jumlah-rak.visible {
-  display: flex;
-}
+#group-jumlah-rak { display: none; }
+#group-jumlah-rak.visible { display: flex; }
 
 
 /* ══════════════════════════════════════════════════════════════
@@ -205,21 +185,20 @@
 }
 
 .labarugi-table .row-untung td {
-  font-size: var(--font-size-xl);  /* ≥20px */
+  font-size: var(--font-size-xl);
   font-weight: 700;
   border-top: 2px solid var(--color-border);
   border-bottom: none;
   padding-top: var(--space-4);
 }
 
-.untung-positif { color: var(--color-primary); }
+.untung-positif { color: var(--color-teal); }
 .untung-negatif { color: var(--color-danger); }
 .untung-netral  { color: var(--color-text-muted); }
 
-/* Margin Keuntungan box */
 .margin-box {
-  background: var(--color-primary-light);
-  border: 1px solid rgba(22, 163, 74, 0.2);
+  background: var(--color-teal-light);
+  border: 1px solid rgba(13,148,136,0.2);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
   text-align: center;
@@ -227,14 +206,14 @@
 
 .margin-box-label {
   font-size: var(--font-size-sm);
-  color: #14532d;
+  color: #134e4a;
   margin-bottom: var(--space-2);
 }
 
 .margin-box-value {
   font-size: var(--font-size-3xl);
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-teal);
 }
 
 
@@ -272,67 +251,48 @@
   align-items: center;
   padding: var(--space-3) 0;
   border-bottom: 1px solid var(--color-border);
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 .produksi-item:last-child { border-bottom: none; }
 
-.produksi-item-date {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--color-text);
-  flex: 1;
-}
+.produksi-item-info { flex: 1; min-width: 0; }
+.produksi-item-date { font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text); }
+.produksi-item-rak  { font-size: var(--font-size-sm); color: var(--color-text-muted); margin: 0 var(--space-2); }
 
-.produksi-item-rak {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+.produksi-item-actions {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+  flex-shrink: 0;
 }
 
 /* ══════════════════════════════════════════════════════════════
-   404 — Halaman Tidak Ditemukan
+   404
    ══════════════════════════════════════════════════════════════ */
 
 .not-found {
   text-align: center;
   padding: var(--space-12) var(--space-4);
 }
-
-.not-found-code {
-  font-size: 5rem;
-  font-weight: 700;
-  color: var(--color-border);
-  line-height: 1;
-}
-
-.not-found-title {
-  font-size: var(--font-size-xl);
-  font-weight: 600;
-  color: var(--color-text);
-  margin: var(--space-4) 0 var(--space-2);
-}
-
-.not-found-desc {
-  color: var(--color-text-muted);
-  margin-bottom: var(--space-6);
-}
+.not-found-code  { font-size: 5rem; font-weight: 700; color: var(--color-border); line-height: 1; }
+.not-found-title { font-size: var(--font-size-xl); font-weight: 600; color: var(--color-text); margin: var(--space-4) 0 var(--space-2); }
+.not-found-desc  { color: var(--color-text-muted); margin-bottom: var(--space-6); }
 
 /* ══════════════════════════════════════════════════════════════
-   RESPONSIVE ADJUSTMENTS
+   RESPONSIVE
    ══════════════════════════════════════════════════════════════ */
 
 @media (max-width: 360px) {
-  .menu-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-3);
-  }
-  .menu-card { padding: var(--space-3); }
-  .summary-today { grid-template-columns: 1fr 1fr; }
-  .quick-actions { flex-direction: column; }
-  .quick-actions .btn { min-width: unset; }
+  .menu-grid           { grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+  .menu-card           { padding: var(--space-3); }
+  .summary-today       { grid-template-columns: 1fr 1fr; }
+  .quick-actions       { flex-direction: column; }
+  .quick-actions .btn  { min-width: unset; }
 }
 
 @media (min-width: 640px) {
-  .menu-grid { grid-template-columns: repeat(4, 1fr); }
-  .summary-today { grid-template-columns: repeat(4, 1fr); }
-  .rekap-summary-grid { grid-template-columns: repeat(4, 1fr); }
+  .menu-grid           { grid-template-columns: repeat(4, 1fr); }
+  .summary-today       { grid-template-columns: repeat(4, 1fr); }
+  .rekap-summary-grid  { grid-template-columns: repeat(4, 1fr); }
 }
+

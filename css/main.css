@@ -1,35 +1,46 @@
 /* ============================================================
-   main.css — Gaya global SIKAT
+   main.css — Gaya global SIKAT (Rebrand: Deep Navy + Teal + Citrine)
    ============================================================ */
 
 /* ── CSS Custom Properties ── */
 :root {
-  /* Colors */
-  --color-primary:       #16a34a;   /* hijau utama — WCAG AA on white */
-  --color-primary-dark:  #15803d;
-  --color-primary-light: #dcfce7;
-  --color-danger:        #dc2626;   /* merah pengeluaran — WCAG AA on white */
+  /* ── Brand Colors ── */
+  --color-navy:          #1e293b;   /* Deep Navy — sidebar, header */
+  --color-navy-dark:     #0f172a;
+  --color-navy-mid:      #334155;   /* hover item sidebar */
+  --color-teal:          #0d9488;   /* Teal/Emerald — aksen utama */
+  --color-teal-dark:     #0f766e;
+  --color-teal-light:    #ccfbf1;
+  --color-citrine:       #eab308;   /* Citrine Yellow — highlight */
+  --color-citrine-light: #fef9c3;
+
+  /* ── Semantic aliases (banyak komponen masih pakai var(--color-primary)) ── */
+  --color-primary:       var(--color-teal);
+  --color-primary-dark:  var(--color-teal-dark);
+  --color-primary-light: var(--color-teal-light);
+
+  --color-danger:        #dc2626;
   --color-danger-light:  #fee2e2;
   --color-warning:       #d97706;
   --color-warning-light: #fef3c7;
-  --color-text:          #1f2937;
-  --color-text-muted:    #6b7280;
-  --color-border:        #e5e7eb;
-  --color-bg:            #f9fafb;
+  --color-text:          #1e293b;
+  --color-text-muted:    #64748b;
+  --color-border:        #e2e8f0;
+  --color-bg:            #f1f5f9;
   --color-surface:       #ffffff;
 
-  /* Typography */
-  --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-size-xs:   0.75rem;   /* 12px */
-  --font-size-sm:   0.875rem;  /* 14px */
-  --font-size-base: 1rem;      /* 16px */
-  --font-size-lg:   1.125rem;  /* 18px */
-  --font-size-xl:   1.25rem;   /* 20px */
-  --font-size-2xl:  1.5rem;    /* 24px */
-  --font-size-3xl:  1.875rem;  /* 30px */
-  --font-size-4xl:  2.25rem;   /* 36px */
+  /* ── Typography ── */
+  --font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-size-xs:   0.75rem;
+  --font-size-sm:   0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg:   1.125rem;
+  --font-size-xl:   1.25rem;
+  --font-size-2xl:  1.5rem;
+  --font-size-3xl:  1.875rem;
+  --font-size-4xl:  2.25rem;
 
-  /* Spacing */
+  /* ── Spacing ── */
   --space-1:  0.25rem;
   --space-2:  0.5rem;
   --space-3:  0.75rem;
@@ -40,23 +51,25 @@
   --space-10: 2.5rem;
   --space-12: 3rem;
 
-  /* Border radius */
-  --radius-sm:  6px;
-  --radius-md:  10px;
-  --radius-lg:  14px;
-  --radius-xl:  20px;
+  /* ── Border Radius (konsisten & rounded) ── */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
   --radius-full: 9999px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.08);
-  --shadow-md: 0 2px 8px rgba(0,0,0,0.10);
-  --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.07);
+  --shadow-md: 0 2px 10px rgba(0,0,0,0.10);
+  --shadow-lg: 0 4px 20px rgba(0,0,0,0.13);
 
-  /* Layout */
-  --header-height: 64px;
-  --max-content-width: 960px;
-  --transition-fast: 150ms ease;
-  --transition-base: 250ms ease;
+  /* ── Layout ── */
+  --header-height:      60px;
+  --sidebar-width:      240px;
+  --bottom-nav-height:  60px;
+  --max-content-width:  960px;
+  --transition-fast:    150ms ease;
+  --transition-base:    250ms ease;
 }
 
 /* ── Reset ── */
@@ -79,19 +92,11 @@ body {
   background-color: var(--color-bg);
   line-height: 1.6;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
-img, svg {
-  max-width: 100%;
-  display: block;
-}
+img, svg { max-width: 100%; display: block; }
 
-a {
-  color: var(--color-primary);
-  text-decoration: none;
-}
+a { color: var(--color-teal); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 ul, ol { list-style: none; }
@@ -108,41 +113,150 @@ input, select, textarea {
   font-size: inherit;
 }
 
-/* ── Hidden utility ── */
 [hidden] { display: none !important; }
 
-/* ── App Shell Layout ── */
+/* ════════════════════════════════════════════════════
+   APP SHELL — Desktop sidebar layout
+   ════════════════════════════════════════════════════ */
+
 #app-shell {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
+/* Mobile: stacked (header top, content, bottom-nav) */
 #header-container {
   position: sticky;
   top: 0;
-  z-index: 100;
-  background: var(--color-primary);
+  z-index: 200;
+  background: var(--color-navy);
+  height: var(--header-height);
+  /* shown on mobile, hidden on desktop */
+}
+
+/* Sidebar — hidden on mobile, visible on desktop */
+#sidebar-container {
+  display: none;
+}
+
+/* Main body area (sidebar + content) */
+#body-shell {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 
 #view-container {
   flex: 1;
-  width: 100%;
-  max-width: var(--max-content-width);
-  margin: 0 auto;
   padding: var(--space-4);
+  min-width: 0;
+  padding-bottom: calc(var(--bottom-nav-height) + var(--space-4));
 }
 
 #footer-container {
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
+  display: none; /* footer hidden on mobile to save space */
+}
+
+/* ── Bottom Navigation (mobile only) ── */
+#bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-nav-height);
+  background: var(--color-navy);
+  display: flex;
+  align-items: stretch;
+  z-index: 200;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.18);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: rgba(255,255,255,0.55);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+  border: none;
+  background: none;
+  padding: var(--space-1) 0;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav-item .bn-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.bottom-nav-item.active,
+.bottom-nav-item:hover {
+  color: var(--color-citrine);
+}
+
+/* ════════════════════════════════════════════════════
+   DESKTOP / TABLET — Sidebar layout (≥768px)
+   ════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+  /* Hide mobile header & bottom nav */
+  #header-container { display: none; }
+  #bottom-nav       { display: none; }
+
+  /* Show sidebar */
+  #sidebar-container {
+    display: flex;
+    flex-direction: column;
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--color-navy);
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  /* Body shell becomes row */
+  #body-shell {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  #view-container {
+    padding: var(--space-6) var(--space-6);
+    padding-bottom: var(--space-8);
+    max-width: var(--max-content-width);
+    margin: 0 auto;
+    flex: 1;
+  }
+
+  #footer-container {
+    display: block;
+    /* sits below #body-shell */
+  }
+}
+
+@media (min-width: 1024px) {
+  #view-container { padding: var(--space-8); }
 }
 
 /* ── Splash Screen ── */
 #splash-screen {
   position: fixed;
   inset: 0;
-  background: var(--color-surface);
+  background: var(--color-navy);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -158,57 +272,27 @@ input, select, textarea {
   padding: var(--space-6);
 }
 
-.splash-logo .logo-icon {
-  width: 64px;
-  height: 64px;
-  background: var(--color-primary);
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  flex-shrink: 0;
-}
-
-/* Water drop shape inside logo icon using clip-path */
-.splash-logo .logo-icon::after {
-  content: '';
-  width: 28px;
-  height: 28px;
-  background: white;
-  border-radius: 50% 50% 50% 0;
-  transform: rotate(-45deg);
-  position: absolute;
+/* SVG logo in splash */
+.splash-logo .logo-svg {
+  width: 72px;
+  height: 72px;
 }
 
 .splash-title {
   font-size: var(--font-size-4xl);
-  font-weight: 700;
-  color: var(--color-primary);
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.06em;
 }
 
 .splash-subtitle {
   font-size: var(--font-size-base);
-  color: var(--color-text-muted);
+  color: rgba(255,255,255,0.7);
 }
 
 .splash-org {
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-}
-
-/* ── Responsive: Desktop ── */
-@media (min-width: 768px) {
-  #view-container {
-    padding: var(--space-6) var(--space-8);
-  }
-}
-
-@media (min-width: 1024px) {
-  #view-container {
-    padding: var(--space-8);
-  }
+  color: var(--color-citrine);
 }
 
 /* ── Notification Container ── */
@@ -216,9 +300,15 @@ input, select, textarea {
   position: fixed;
   top: calc(var(--header-height) + var(--space-4));
   right: var(--space-4);
-  z-index: 200;
+  z-index: 300;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
   max-width: min(360px, calc(100vw - 2rem));
+}
+
+@media (min-width: 768px) {
+  #notification-container {
+    top: var(--space-4);
+  }
 }
