@@ -3,6 +3,8 @@
 import { StorageService } from '../storage.js';
 import { CalculationEngine } from '../calculator.js';
 import { showNotification } from '../app.js';
+import { isIncome as catIsIncome, normalizeTransaction, findCategoryAndSub } from '../categories.js';
+import { renderTransactionForm, attachTransactionFormListeners } from '../transaction-form.js';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -19,20 +21,25 @@ function formatTanggal(iso) {
   return `${d}/${m}/${y}`;
 }
 
-/** Human-readable label for a jenis value */
+/** Label ramah-pengguna untuk satu jenis / sub-kategori */
 export function jenisLabel(jenis) {
-  const MAP = {
-    penjualan_telur: 'Penjualan Telur',
-    penjualan_lain:  'Penjualan Lain',
-    pembelian_pakan: 'Pembelian Pakan',
-    biaya_lain:      'Biaya Lain',
-  };
-  return MAP[jenis] ?? jenis;
+  return findCategoryAndSub(jenis)?.subcategory?.name ?? String(jenis ?? 'Transaksi');
 }
 
-/** True for income jenis */
-function isIncome(jenis) {
-  return jenis === 'penjualan_telur' || jenis === 'penjualan_lain';
+/** Ikon + nama sub-kategori (+ keterangan) untuk satu baris transaksi */
+function txLabel(t) {
+  const norm = normalizeTransaction(t);
+  const sub  = findCategoryAndSub(norm.kategori, norm.subKategori)?.subcategory;
+  const nama = sub?.name ?? jenisLabel(norm.jenis);
+  const ikon = sub?.icon ?? (isIncome(t) ? '\u{1F4B0}' : '\u{1F4B8}');
+  const ket  = norm.keterangan && norm.keterangan !== nama
+    ? `: ${escHtml(norm.keterangan)}` : '';
+  return `${ikon} ${escHtml(nama)}${ket}`;
+}
+
+/** Kas masuk? Mengikuti bagan kategori (mendukung data legacy). */
+function isIncome(tx) {
+  return catIsIncome(tx);
 }
 
 function escHtml(s) {
@@ -108,8 +115,8 @@ function _buildSummaryHTML(transactions) {
 
   for (const t of transactions) {
     if (!t.tanggal.startsWith(prefix)) continue;
-    if (isIncome(t.jenis)) pemasukan   += t.nominal;
-    else                   pengeluaran += t.nominal;
+    if (isIncome(t)) pemasukan   += t.nominal;
+    else             pengeluaran += t.nominal;
   }
 
   return `
@@ -139,87 +146,30 @@ function _buildTxListHTML(transactions) {
     b.tanggal.localeCompare(a.tanggal) || (b.createdAt||'').localeCompare(a.createdAt||''));
 
   return sorted.map((t) => {
-    // Build subtitle: tanggal • lokasi [• keterangan]
-    let meta = `${formatTanggal(t.tanggal)} &bull; ${escHtml(t.lokasi)}`;
-    if (t.keterangan) meta += ` &bull; <em>${escHtml(t.keterangan)}</em>`;
+    const norm = normalizeTransaction(t);
+    const inc  = isIncome(t);
 
-    // Display name: use keterangan as sub-label for flexible types
-    let typeDisplay = jenisLabel(t.jenis);
-    if (t.keterangan && (t.jenis === 'biaya_lain' || t.jenis === 'penjualan_lain')) {
-      typeDisplay = `${jenisLabel(t.jenis)}: ${escHtml(t.keterangan)}`;
+    // Subtitle: tanggal • lokasi [• qty × harga satuan]
+    let meta = `${formatTanggal(t.tanggal)} &bull; ${escHtml(t.lokasi || '\u2014')}`;
+    if (norm.kuantitas > 0 && norm.hargaSatuan > 0) {
+      meta += ` &bull; ${norm.kuantitas} ${escHtml(norm.satuan || 'unit')} \u00D7 ${formatRupiah(norm.hargaSatuan)}`;
     }
 
     return `
       <div class="tx-item" data-tx-id="${escHtml(t.id)}">
         <div class="tx-item-info">
-          <p class="tx-item-type">${typeDisplay}</p>
+          <p class="tx-item-type">${txLabel(t)}</p>
           <p class="tx-item-meta">${meta}</p>
         </div>
-        <p class="tx-item-amount ${isIncome(t.jenis) ? 'amount-income' : 'amount-expense'}">
-          ${isIncome(t.jenis) ? '+' : '-'}${formatRupiah(t.nominal)}
+        <p class="tx-item-amount ${inc ? 'amount-income' : 'amount-expense'}">
+          ${inc ? '+' : '-'}${formatRupiah(t.nominal)}
         </p>
         <div class="tx-actions">
-          <button class="btn-edit-tx"   data-id="${escHtml(t.id)}" title="Edit"   aria-label="Edit ${jenisLabel(t.jenis)}">✏️</button>
-          <button class="btn-delete-tx" data-id="${escHtml(t.id)}" title="Hapus"  aria-label="Hapus ${jenisLabel(t.jenis)}">🗑️</button>
+          <button class="btn-edit-tx"   data-id="${escHtml(t.id)}" title="Edit"   aria-label="Edit transaksi">\u270F\uFE0F</button>
+          <button class="btn-delete-tx" data-id="${escHtml(t.id)}" title="Hapus"  aria-label="Hapus transaksi">\u{1F5D1}\uFE0F</button>
         </div>
       </div>`;
   }).join('');
-}
-
-// ─── Edit form ───────────────────────────────────────────────────────────────
-
-function _buildEditFormHTML(tx) {
-  const JENIS_OPTIONS = [
-    { val: 'penjualan_telur', lbl: 'Penjualan Telur' },
-    { val: 'penjualan_lain',  lbl: 'Penjualan Lain' },
-    { val: 'pembelian_pakan', lbl: 'Pembelian Pakan' },
-    { val: 'biaya_lain',      lbl: 'Biaya Lain' },
-  ];
-
-  const optionsHTML = JENIS_OPTIONS.map((o) =>
-    `<option value="${o.val}"${tx.jenis === o.val ? ' selected' : ''}>${o.lbl}</option>`).join('');
-
-  const needsKet = tx.jenis === 'biaya_lain' || tx.jenis === 'penjualan_lain';
-
-  return `
-    <div class="inline-edit-form" id="edit-tx-form-card">
-      <h4>✏️ Edit Transaksi</h4>
-
-      <div class="form-group">
-        <label class="form-label" for="edit-tx-jenis">Jenis Transaksi</label>
-        <select class="form-control" id="edit-tx-jenis">${optionsHTML}</select>
-      </div>
-
-      <div class="form-group" id="edit-group-keterangan" style="${needsKet ? '' : 'display:none'}">
-        <label class="form-label" for="edit-tx-keterangan" id="edit-label-keterangan">
-          ${tx.jenis === 'penjualan_lain' ? 'Nama Penjualan' : 'Nama/Jenis Biaya'}
-        </label>
-        <input class="form-control" type="text" id="edit-tx-keterangan"
-          value="${escHtml(tx.keterangan || '')}" maxlength="100">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="edit-tx-tanggal">Tanggal</label>
-        <input class="form-control" type="date" id="edit-tx-tanggal" value="${escHtml(tx.tanggal)}">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="edit-tx-lokasi">Lokasi</label>
-        <input class="form-control" type="text" id="edit-tx-lokasi"
-          value="${escHtml(tx.lokasi)}" maxlength="100">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="edit-tx-nominal">Nominal (Rp)</label>
-        <input class="form-control" type="number" id="edit-tx-nominal"
-          min="1" max="999999999999" value="${tx.nominal}">
-      </div>
-
-      <div class="inline-edit-actions">
-        <button class="btn btn-primary" id="edit-tx-save">💾 Simpan</button>
-        <button class="btn btn-outline" id="edit-tx-cancel">Batal</button>
-      </div>
-    </div>`;
 }
 
 // ─── Full UI refresh ─────────────────────────────────────────────────────────
@@ -312,52 +262,28 @@ function _handleEditOpen(txId) {
   _editingId = txId;
 
   const slot = document.getElementById('edit-tx-slot');
-  if (slot) {
-    slot.innerHTML = _buildEditFormHTML(tx);
-    slot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    _attachEditFormListeners(tx);
-  }
+  if (!slot) return;
+
+  // Form bersama: kategori bertingkat, kuantitas x harga satuan, konversi telur
+  slot.innerHTML = renderTransactionForm({
+    formId: 'edit-tx-form',
+    initialData: normalizeTransaction(tx),
+    mode: 'inline',
+    showCancel: true,
+    submitLabel: '\u{1F4BE} Simpan Perubahan',
+  });
+  slot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  attachTransactionFormListeners({
+    formId: 'edit-tx-form',
+    initialData: tx,
+    onSaved: () => _refreshUI(),
+    onCancel: _closeEditForm,
+  });
 }
 
 function _closeEditForm() {
   const slot = document.getElementById('edit-tx-slot');
   if (slot) slot.innerHTML = '';
   _editingId = null;
-}
-
-function _attachEditFormListeners(originalTx) {
-  document.getElementById('edit-tx-cancel')?.addEventListener('click', _closeEditForm);
-
-  // Toggle keterangan field on jenis change
-  document.getElementById('edit-tx-jenis')?.addEventListener('change', (e) => {
-    const jenis       = e.target.value;
-    const groupKet    = document.getElementById('edit-group-keterangan');
-    const labelKet    = document.getElementById('edit-label-keterangan');
-    const needsKet    = jenis === 'biaya_lain' || jenis === 'penjualan_lain';
-    if (groupKet) groupKet.style.display = needsKet ? '' : 'none';
-    if (labelKet) labelKet.textContent   = jenis === 'penjualan_lain' ? 'Nama Penjualan' : 'Nama/Jenis Biaya';
-  });
-
-  document.getElementById('edit-tx-save')?.addEventListener('click', () => {
-    const jenis      = document.getElementById('edit-tx-jenis')?.value || '';
-    const tanggal    = document.getElementById('edit-tx-tanggal')?.value || '';
-    const lokasi     = (document.getElementById('edit-tx-lokasi')?.value || '').trim();
-    const nominal    = Number(document.getElementById('edit-tx-nominal')?.value || 0);
-    const keterangan = (document.getElementById('edit-tx-keterangan')?.value || '').trim();
-    const needsKet   = jenis === 'biaya_lain' || jenis === 'penjualan_lain';
-
-    if (!jenis)          { showNotification('Pilih jenis transaksi.', 'warning', 3000); return; }
-    if (!tanggal)        { showNotification('Tanggal wajib diisi.', 'warning', 3000); return; }
-    if (!lokasi)         { showNotification('Lokasi wajib diisi.', 'warning', 3000); return; }
-    if (nominal < 1)     { showNotification('Nominal harus lebih dari 0.', 'warning', 3000); return; }
-    if (needsKet && !keterangan) { showNotification('Keterangan wajib diisi.', 'warning', 3000); return; }
-
-    const updates = { jenis, tanggal, lokasi, nominal };
-    if (needsKet) updates.keterangan = keterangan;
-    else delete updates.keterangan; // clear if jenis changed away from flexible type
-
-    const ok = StorageService.updateTransaction(originalTx.id, updates);
-    if (ok) { showNotification('Transaksi berhasil diperbarui.', 'success', 3000); _refreshUI(); }
-    else      showNotification('Gagal memperbarui transaksi.', 'error');
-  });
 }

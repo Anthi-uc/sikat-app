@@ -390,6 +390,25 @@ select.form-control {
   background: var(--color-teal-dark);
 }
 
+/* Sub-menu Pengaturan (<details>) */
+.sidebar-group > summary {
+  list-style: none;
+  justify-content: flex-start;
+}
+.sidebar-group > summary::-webkit-details-marker { display: none; }
+.sidebar-group > summary::after {
+  content: '⌄';
+  margin-left: auto;
+  font-size: 0.9rem;
+  opacity: 0.6;
+  transition: transform var(--transition-fast);
+}
+.sidebar-group[open] > summary::after { transform: rotate(180deg); }
+.sidebar-subnav-item {
+  padding-left: calc(var(--space-4) + 22px + var(--space-3));
+  font-size: var(--font-size-xs);
+}
+
 /* Divider */
 .sidebar-divider {
   height: 1px;
