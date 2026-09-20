@@ -97,6 +97,10 @@ function attachViewListeners(hash, params = {}) {
  * @param {Object} params - optional params passed to the view's render/attachListeners
  */
 export function navigate(hash, params = {}) {
+  if (hash && typeof hash === 'string' && !hash.startsWith('#')) {
+    hash = '#' + hash;
+  }
+
   // ── Navigation Guard ────────────────────────────────────────────────────
   if (!PUBLIC_ROUTES.has(hash) && !AuthService.isLoggedIn()) {
     hash = '#login';
@@ -128,7 +132,15 @@ export function navigate(hash, params = {}) {
   setSidebarActive(hash);
   setBottomNavActive(hash);
 
-  // Scroll to top
+  // Scroll to top (both desktop body-shell container and window)
+  const bodyShell = document.getElementById('body-shell');
+  if (bodyShell) {
+    bodyShell.scrollTop = 0;
+  }
+  const viewContainer = document.getElementById('view-container');
+  if (viewContainer) {
+    viewContainer.scrollTop = 0;
+  }
   window.scrollTo(0, 0);
 }
 

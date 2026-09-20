@@ -1,9 +1,9 @@
 /* ============================================================
-   laporan.css â€” Modul Laporan Keuangan SIKAT
+   laporan.css — Modul Laporan Keuangan SIKAT
    Tab nav, sub-view tables, print preview
    ============================================================ */
 
-/* â”€â”€ Tab Navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Tab Navigation ─────────────────────────────────────────────────────── */
 
 .laporan-tabs {
   display: flex;
@@ -20,6 +20,10 @@
 
 .laporan-tab-btn {
   flex-shrink: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: var(--space-2) var(--space-4);
   border: none;
   background: rgba(255,255,255,0.08);
@@ -41,7 +45,7 @@
   color: var(--color-navy);
 }
 
-/* â”€â”€ Tab panel wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Tab panel wrapper ───────────────────────────────────────────────────── */
 
 .laporan-panel-wrap {
   background: var(--color-surface);
@@ -53,7 +57,15 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* â”€â”€ Shared table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Shared table ────────────────────────────────────────────────────────── */
+
+/* Table responsive wrapper */
+.laporan-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: var(--space-4);
+}
 
 .laporan-table {
   width: 100%;
@@ -90,6 +102,10 @@
 
 .laporan-table .debit  { color: var(--color-danger); font-weight: 600; }
 .laporan-table .kredit { color: var(--color-teal);   font-weight: 600; }
+.laporan-table .debit-kas,
+.laporan-table .kas-masuk  { color: var(--color-teal);   font-weight: 600; }
+.laporan-table .kredit-kas,
+.laporan-table .kas-keluar { color: var(--color-danger); font-weight: 600; }
 .laporan-table .saldo-positif { color: var(--color-teal); }
 .laporan-table .saldo-negatif { color: var(--color-danger); }
 
@@ -98,7 +114,7 @@
   background: rgba(241,245,249,0.5);
 }
 
-/* â”€â”€ Section heading inside panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Section heading inside panel ───────────────────────────────────────── */
 
 .laporan-section-title {
   font-size: var(--font-size-base);
@@ -112,9 +128,9 @@
   gap: var(--space-2);
 }
 
-/* â”€â”€ Month navigator (reuses .month-nav from components.css) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Month navigator (reuses .month-nav from components.css) ─────────────── */
 
-/* â”€â”€ Neraca boxes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Neraca boxes ────────────────────────────────────────────────────────── */
 
 .neraca-grid {
   display: grid;
@@ -153,7 +169,7 @@
   margin-top: var(--space-1);
 }
 
-/* â”€â”€ CALK narrative â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── CALK narrative ──────────────────────────────────────────────────────── */
 
 .calk-list {
   list-style: none;
@@ -185,7 +201,7 @@
 }
 .calk-item-text strong { color: var(--color-navy); }
 
-/* â”€â”€ Toolbar (print button + export) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Toolbar (print button + export) ────────────────────────────────────── */
 
 .laporan-toolbar {
   display: flex;
@@ -200,8 +216,23 @@
   gap: var(--space-2);
   flex-wrap: wrap;
 }
+@media (max-width: 480px) {
+  .laporan-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .laporan-toolbar-right {
+    width: 100%;
+  }
+  .laporan-toolbar-right .btn {
+    flex: 1;
+  }
+  .laporan-panel-wrap {
+    padding: var(--space-3);
+  }
+}
 
-/* â”€â”€ Signature row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Signature row ───────────────────────────────────────────────────────── */
 
 .tanda-tangan-grid {
   display: grid;
@@ -228,7 +259,7 @@
   font-weight: 600;
 }
 
-/* â”€â”€ Buku Kas row actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Buku Kas row actions ────────────────────────────────────────────────── */
 .buku-kas-actions {
   display: flex;
   gap: var(--space-1);
@@ -254,9 +285,38 @@ body.is-printing > #print-portal {
   display: block !important;
 }
 
-/* The portal itself (created by JS, normally hidden) */
-#print-portal {
-  display: none;
+/* Badges for Arus Kas & Categories */
+.badge-stream {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.badge-operasi   { background: #e0f2fe; color: #0369a1; }
+.badge-investasi { background: #fef3c7; color: #b45309; }
+.badge-pendanaan { background: #f3e8ff; color: #7e22ce; }
+
+.neraca-balance-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+.neraca-balance-badge.balance-ok {
+  background: var(--color-teal-light);
+  color: #065f46;
+  border: 1px solid var(--color-teal);
+}
+.neraca-balance-badge.balance-diff {
+  background: var(--color-danger-light);
+  color: #991b1b;
+  border: 1px solid var(--color-danger);
 }
 
 @media print {

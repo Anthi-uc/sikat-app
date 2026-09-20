@@ -282,12 +282,23 @@
    RESPONSIVE
    ══════════════════════════════════════════════════════════════ */
 
-@media (max-width: 360px) {
+@media (max-width: 480px) {
   .menu-grid           { grid-template-columns: 1fr 1fr; gap: var(--space-3); }
   .menu-card           { padding: var(--space-3); }
-  .summary-today       { grid-template-columns: 1fr 1fr; }
+  .summary-today       { grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+  .summary-today-item  { padding: var(--space-3); }
+  .summary-today-value { font-size: var(--font-size-lg); }
   .quick-actions       { flex-direction: column; }
-  .quick-actions .btn  { min-width: unset; }
+  .quick-actions .btn  { width: 100%; min-width: unset; }
+  .rekap-summary-grid  { grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+  .rekap-summary-item  { padding: var(--space-3); }
+  .transaksi-form      { padding: var(--space-4); }
+}
+
+@media (max-width: 360px) {
+  .menu-grid           { grid-template-columns: 1fr; gap: var(--space-3); }
+  .summary-today       { grid-template-columns: 1fr; }
+  .rekap-summary-grid  { grid-template-columns: 1fr; }
 }
 
 @media (min-width: 640px) {

@@ -1,7 +1,7 @@
 // js/app.js — Entry point SIKAT; sidebar, mobile header, bottom nav, notifications
 
 import { navigate } from './router.js';
-import { StorageService } from './storage.js';
+import { StorageService, migrateLocalStorageUtf8 } from './storage.js';
 import { getNamaAdmin, getFotoProfil, DEFAULT_AVATAR_SVG } from './views/profil.js';
 
 // ─── SVG Logo ────────────────────────────────────────────────────────────────
@@ -357,6 +357,12 @@ export function showNotification(message, type = 'success', autoHide = 3000) {
 // ─── App Initialisation ───────────────────────────────────────────────────────
 
 function initApp() {
+  try {
+    migrateLocalStorageUtf8();
+  } catch (e) {
+    console.warn('[App] Gagal migrasi UTF-8 localStorage:', e);
+  }
+
   renderFooter();
 
   const splash   = document.getElementById('splash-screen');

@@ -60,7 +60,7 @@
   --header-height:     60px;
   --sidebar-width:     240px;
   --bottom-nav-height: 60px;
-  --max-content-width: 960px;
+  --max-content-width: 1200px;
   --transition-fast:   150ms ease;
   --transition-base:   250ms ease;
 }
@@ -74,6 +74,7 @@ html {
   -webkit-text-size-adjust: 100%;
   /* Let the page be taller than viewport — scroll on <html> for mobile */
   height: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -83,6 +84,7 @@ body {
   background-color: var(--color-bg);
   line-height: 1.6;
   min-height: 100%;
+  overflow-x: hidden;
 }
 
 img, svg { max-width: 100%; display: block; }
@@ -121,30 +123,34 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   display: none;
 }
 
-/* Wrapper that holds [sidebar] + [view-container] side by side on desktop */
+/* Wrapper that holds [view-container] + [footer-container] */
 #body-shell {
   display: flex;
-  flex-direction: column;   /* column on mobile (no sidebar) */
-  flex: 1;
+  flex-direction: column;   /* column on mobile */
+  flex: 1 0 auto;
   min-height: 0;
+  min-width: 0;
 }
 
 /* Main content area */
 #view-container {
-  flex: 1 1 auto;
+  flex: 1 0 auto;
   min-width: 0;           /* prevent flex-child blowing past container */
   overflow-x: hidden;
   padding: var(--space-4);
-  /* Leave room for fixed bottom nav */
-  padding-bottom: calc(var(--bottom-nav-height) + var(--space-6));
+  padding-bottom: var(--space-6);
 }
 
-/* Footer hidden on mobile */
+/* Sticky Footer */
 #footer-container {
-  display: none;
+  display: block;
   flex-shrink: 0;
+  margin-top: auto;
+  width: 100%;
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
+  /* Ensure padding for fixed bottom nav on mobile */
+  padding-bottom: calc(var(--bottom-nav-height) + var(--space-4) + env(safe-area-inset-bottom, 0px));
 }
 
 /* Fixed bottom navigation */
@@ -153,7 +159,8 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   bottom: 0;
   left: 0;
   right: 0;
-  height: var(--bottom-nav-height);
+  height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   background: var(--color-navy);
   display: flex;
   align-items: stretch;
@@ -163,22 +170,23 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 
 .bottom-nav-item {
   flex: 1;
+  min-height: 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  color: rgba(255,255,255,0.55);
-  font-size: 0.6rem;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   cursor: pointer;
   border: none;
   background: none;
-  padding: var(--space-1) 0;
+  padding: var(--space-1) 2px;
   text-transform: uppercase;
   -webkit-tap-highlight-color: transparent;
-  transition: color var(--transition-fast);
+  transition: color var(--transition-fast), background var(--transition-fast);
 }
 .bottom-nav-item .bn-icon { font-size: 1.25rem; line-height: 1; }
 .bottom-nav-item.active,
@@ -188,22 +196,21 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
    DESKTOP / TABLET LAYOUT  (>= 768px)
    Architecture:
      <body>
-       #app-shell  [display:flex; flex-direction:ROW; height:100vh]
-         #sidebar-container  [fixed 240px; overflow-y:auto]
-         #body-shell         [flex:1; display:flex; flex-direction:COLUMN; overflow:hidden]
-           #header-container [hidden]
-           #view-container   [flex:1; overflow-y:auto — THIS scrolls]
-           #footer-container [shrink:0]
+       #app-shell  [display:flex; flex-direction:ROW; height:100vh; overflow:hidden]
+         #sidebar-container  [fixed-width 240px–260px; height:100vh; overflow-y:auto]
+         #body-shell         [flex:1 1 0; min-width:0; height:100vh; overflow-y:auto; overflow-x:hidden; display:flex; flex-direction:COLUMN]
+           #view-container   [flex:1 0 auto; width:100%]
+           #footer-container [shrink:0; margin-top:auto; sticky footer]
    ════════════════════════════════════════════════════ */
 
 @media (min-width: 768px) {
 
-  /* ── Root shell: horizontal row ── */
+  /* ── Root shell: horizontal row (sidebar left, body-shell right) ── */
   #app-shell {
     flex-direction: row;
     align-items: stretch;
     height: 100vh;
-    overflow: hidden;   /* prevents double scrollbar; each column scrolls itself */
+    overflow: hidden;   /* prevents window double scrollbar; body-shell scrolls */
   }
 
   /* ── Hide mobile-only chrome ── */
@@ -223,7 +230,6 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
     overflow-x: hidden;
     background: var(--color-navy);
     border-right: 1px solid rgba(255,255,255,0.06);
-    /* Scroll independently */
     position: relative;
   }
 
@@ -236,40 +242,42 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
     flex: 1 0 auto;
   }
 
-  /* ── Right column: stacks header(hidden) + view + footer ── */
+  /* ── Right column: stacks view + sticky footer, fills all remaining width ── */
   #body-shell {
     display: flex;
     flex-direction: column;
-    flex: 1 1 0;          /* take remaining width, but DO NOT shrink below 0 */
+    flex: 1 1 0;          /* take remaining width, filling entire screen (no 3rd column) */
     min-width: 0;         /* critical: prevent flex blowout on wide screens */
     height: 100vh;
-    overflow: hidden;
+    overflow-y: auto;     /* THIS region scrolls naturally for content + footer */
+    overflow-x: hidden;
   }
 
-  /* ── Content area: the ONLY scrolling region ── */
+  /* ── Content area: expands to fill space, pushes sticky footer down ── */
   #view-container {
     display: block;
-    flex: 1 1 auto;
-    min-height: 0;        /* allow flex child to shrink and scroll */
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: var(--space-6);
-    padding-bottom: var(--space-10);
-    /* Center content with a max-width cap */
+    flex: 1 0 auto;
+    min-height: 0;
     width: 100%;
+    padding: var(--space-6);
+    padding-bottom: var(--space-8);
   }
 
   /* Inner centering wrapper — content never exceeds max-width */
-  #view-container > * {
+  #view-container > *,
+  #footer-container > * {
     max-width: var(--max-content-width);
     margin-left: auto;
     margin-right: auto;
   }
 
-  /* ── Footer ── */
+  /* ── Sticky Footer: pinned to bottom if short, pushed down if long ── */
   #footer-container {
     display: block;
     flex-shrink: 0;
+    margin-top: auto;
+    width: 100%;
+    padding-bottom: 0;   /* No bottom nav on desktop */
   }
 }
 
@@ -279,6 +287,10 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 
 @media (min-width: 1280px) {
   :root { --sidebar-width: 260px; }
+}
+
+@media (min-width: 1400px) {
+  :root { --max-content-width: 1280px; }
 }
 
 /* ── Splash Screen ── */

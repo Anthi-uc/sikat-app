@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#1e293b">
   <meta name="description" content="Sistem Informasi Kas Ayam Ternak — BUMKam Torei Natei">
   <title>SIKAT — BUMKam Torei Natei</title>
@@ -45,16 +45,17 @@
     <!-- Mobile top header (hidden on desktop via CSS) -->
     <header id="header-container" role="banner"></header>
 
-    <!-- Body: sidebar + content -->
-    <div id="body-shell">
-      <!-- Desktop sidebar (hidden on mobile via CSS) -->
-      <nav id="sidebar-container" role="navigation" aria-label="Navigasi utama"></nav>
+    <!-- Desktop sidebar (hidden on mobile via CSS) -->
+    <nav id="sidebar-container" role="navigation" aria-label="Navigasi utama"></nav>
 
+    <!-- Body: content + sticky footer -->
+    <div id="body-shell">
       <!-- Page content -->
       <main id="view-container" role="main" tabindex="-1"></main>
-    </div>
 
-    <footer id="footer-container" role="contentinfo"></footer>
+      <!-- Sticky footer -->
+      <footer id="footer-container" role="contentinfo"></footer>
+    </div>
 
     <!-- Mobile bottom navigation (hidden on desktop via CSS) -->
     <nav id="bottom-nav" role="navigation" aria-label="Navigasi bawah"></nav>

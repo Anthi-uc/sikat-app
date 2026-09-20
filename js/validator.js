@@ -64,48 +64,76 @@ function validateJumlahRak(value) {
 }
 
 /**
+ * Validates a kuantitas value string or number (> 0).
+ * @param {string|number} value
+ * @returns {boolean}
+ */
+function validateKuantitas(value) {
+  if (value == null || value === '') return false;
+  const num = Number(value);
+  return !isNaN(num) && num > 0 && num <= 999_999_999;
+}
+
+/**
  * Validates transaksi form data.
- * @param {{ jenis: string, tanggal: string, lokasi: string, nominal: string, jumlahRak?: string }} data
+ * @param {{ jenis?: string, kategori?: string, subKategori?: string, tanggal: string, lokasi: string, nominal: string, jumlahRak?: string, kuantitas?: string|number, hargaSatuan?: string|number }} data
  * @returns {{ valid: boolean, errors: Record<string, string> }}
  */
 function validateTransaksi(data) {
   const errors = {};
-  const VALID_JENIS = ['penjualan_telur', 'pembelian_pakan', 'biaya_lain'];
+  const VALID_LEGACY_JENIS = ['penjualan_telur', 'pembelian_pakan', 'biaya_lain', 'penjualan_lain'];
 
-  // jenis
-  if (!data.jenis || !VALID_JENIS.includes(data.jenis)) {
+  // Validasi kategori / jenis
+  const hasCategory = Boolean(data.kategori || data.subKategori);
+  const hasJenis = Boolean(data.jenis);
+
+  if (!hasCategory && !hasJenis) {
     errors.jenis = 'Jenis transaksi wajib dipilih.';
+  } else if (hasJenis && !hasCategory) {
+    if (!VALID_LEGACY_JENIS.includes(data.jenis) && typeof data.jenis === 'string' && data.jenis.trim() === '') {
+      errors.jenis = 'Jenis transaksi wajib dipilih.';
+    }
   }
 
   // tanggal
-  if (!data.tanggal || data.tanggal.trim() === '') {
+  if (!data.tanggal || String(data.tanggal).trim() === '') {
     errors.tanggal = 'Tanggal wajib diisi.';
   }
 
   // lokasi
-  if (!data.lokasi || data.lokasi.trim() === '') {
+  if (!data.lokasi || String(data.lokasi).trim() === '') {
     errors.lokasi = 'Lokasi wajib diisi.';
-  } else if (data.lokasi.length > 100) {
+  } else if (String(data.lokasi).length > 100) {
     errors.lokasi = 'Lokasi maksimal 100 karakter.';
   }
 
   // nominal
-  if (!data.nominal || data.nominal.trim() === '') {
+  if (!data.nominal || String(data.nominal).trim() === '') {
     errors.nominal = 'Nominal wajib diisi.';
-  } else if (!validateNominal(data.nominal)) {
+  } else if (!validateNominal(String(data.nominal))) {
     errors.nominal = 'Nominal harus berupa angka antara 1 dan 999.999.999.999.';
   }
 
-  // jumlahRak — required only for penjualan_telur
-  if (data.jenis === 'penjualan_telur') {
-    if (!data.jumlahRak || data.jumlahRak.trim() === '') {
-      errors.jumlahRak = 'Jumlah rak wajib diisi untuk penjualan telur.';
-    } else if (!validateJumlahRak(data.jumlahRak)) {
-      errors.jumlahRak = 'Jumlah rak harus berupa angka antara 1 dan 9.999.';
+  // kuantitas (jika diisi)
+  if (data.kuantitas !== undefined && data.kuantitas !== '') {
+    if (!validateKuantitas(data.kuantitas)) {
+      errors.kuantitas = 'Kuantitas harus berupa angka lebih dari 0.';
     }
   }
 
-  return { valid: Object.keys(errors).length === 0, errors };
+  // jumlahRak — required only for legacy penjualan_telur test check
+  if (data.jenis === 'penjualan_telur') {
+    if (data.jumlahRak !== undefined) {
+      if (!data.jumlahRak || String(data.jumlahRak).trim() === '') {
+        errors.jumlahRak = 'Jumlah rak wajib diisi untuk penjualan telur.';
+      } else if (!validateJumlahRak(String(data.jumlahRak))) {
+        errors.jumlahRak = 'Jumlah rak harus berupa angka antara 1 dan 9.999.';
+      }
+    }
+  }
+
+  const isValid = Object.keys(errors).length === 0;
+  return { valid: isValid, isValid, errors };
 }
 
 /**
@@ -137,6 +165,7 @@ export const Validator = {
   validateDateFormat,
   validateNominal,
   validateJumlahRak,
+  validateKuantitas,
   validateTransaksi,
   validateProduksi,
 };

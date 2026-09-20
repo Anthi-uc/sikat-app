@@ -1,7 +1,7 @@
 // sw.js — Service Worker SIKAT
 // Strategy: Cache-First for static assets, fallback to network
 
-const CACHE_NAME = 'sikat-v1';
+const CACHE_NAME = 'sikat-v2.2';
 
 const STATIC_ASSETS = [
   './',
@@ -10,9 +10,13 @@ const STATIC_ASSETS = [
   './css/main.css',
   './css/components.css',
   './css/views.css',
+  './css/laporan.css',
   './js/app.js',
   './js/router.js',
+  './js/auth.js',
   './js/storage.js',
+  './js/categories.js',
+  './js/transaction-form.js',
   './js/calculator.js',
   './js/validator.js',
   './js/charts.js',
@@ -21,6 +25,13 @@ const STATIC_ASSETS = [
   './js/views/rekap.js',
   './js/views/labarugi.js',
   './js/views/produksi.js',
+  './js/views/profil.js',
+  './js/views/login.js',
+  './js/views/register.js',
+  './js/views/panduan.js',
+  './js/views/kebijakan.js',
+  './js/views/kontak.js',
+  './js/views/versi.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/icons/apple-touch-icon.png',

@@ -298,4 +298,129 @@ export const StorageService = {
     localStorage.removeItem(KEYS.TRANSACTIONS);
     localStorage.removeItem(KEYS.PRODUCTIONS);
   },
+
+  migrateUtf8(storage) {
+    return migrateLocalStorageUtf8(storage);
+  },
 };
+
+// ─── UTF-8 Mojibake Migration ───────────────────────────────────────────────
+
+export const MIGRATION_FLAG_KEY = 'sikat_migrated_utf8';
+
+const MOJIBAKE_REPLACEMENTS = [
+  ['ðŸ–¨ï¸ ', '🖨️'],
+  ['ðŸ–¨',    '🖨️'],
+  ['âš–ï¸ ', '⚖️'],
+  ['âš–',    '⚖️'],
+  ['âœ ï¸ ', '✏️'],
+  ['âœ ',    '✏️'],
+  ['ðŸ—‘ï¸ ', '🗑️'],
+  ['ðŸ—‘',    '🗑️'],
+  ['ðŸ“Š',    '📊'],
+  ['ðŸ’¸',    '💸'],
+  ['ðŸ“ ',    '📑'],
+  ['ðŸ“’',    '📒'],
+  ['ðŸ“¥',    '📥'],
+  ['ðŸ“‹',    '📋'],
+  ['ðŸ“ˆ',    '📈'],
+  ['ðŸ’¾',    '💾'],
+  ['âž•',    '➕'],
+  ['â€¢',    '•'],
+  ['â€”',    '—'],
+  ['â€“',    '–'],
+  ['â€™',    "'"],
+  ['â€œ',    '“'],
+  ['â€',     '”'],
+  ['âˆ−',    '−'],
+  ['âˆ’',    '−'],
+  ['â‰ˆ',    '≈'],
+  ['â• ',    '═'],
+  ['â”€',    '─'],
+  ['â†’',    '→'],
+  ['Ã—',     '×'],
+  ['Â ',     ' '],
+  ['Â',      ''],
+];
+
+/**
+ * Clean corrupted mojibake characters in a string to correct UTF-8.
+ * @param {string} str
+ * @returns {string}
+ */
+export function cleanMojibakeString(str) {
+  if (typeof str !== 'string' || !str) return str;
+  if (!/[âðÃÂ]/.test(str)) return str;
+
+  let res = str;
+  for (const [bad, good] of MOJIBAKE_REPLACEMENTS) {
+    if (res.includes(bad)) {
+      res = res.replaceAll(bad, good);
+    }
+  }
+  return res;
+}
+
+function cleanDeep(val) {
+  if (typeof val === 'string') return cleanMojibakeString(val);
+  if (Array.isArray(val)) return val.map(cleanDeep);
+  if (val && typeof val === 'object') {
+    const out = {};
+    for (const [k, v] of Object.entries(val)) {
+      out[cleanMojibakeString(k)] = cleanDeep(v);
+    }
+    return out;
+  }
+  return val;
+}
+
+/**
+ * One-time migration function to clean corrupted UTF-8 text from existing localStorage.
+ * Sets flag `sikat_migrated_utf8` so it runs only once.
+ * @param {Storage} [customStorage]
+ * @returns {{ migrated: boolean, count?: number, reason?: string, error?: any }}
+ */
+export function migrateLocalStorageUtf8(customStorage) {
+  const store = customStorage ?? (typeof localStorage !== 'undefined' ? localStorage : null);
+  if (!store) return { migrated: false, count: 0, reason: 'no_storage' };
+
+  try {
+    if (store.getItem(MIGRATION_FLAG_KEY) === 'true') {
+      return { migrated: false, count: 0, reason: 'already_migrated' };
+    }
+
+    let modifiedCount = 0;
+    const keys = [];
+    for (let i = 0; i < store.length; i++) {
+      const k = store.key(i);
+      if (k && k !== MIGRATION_FLAG_KEY) keys.push(k);
+    }
+
+    for (const key of keys) {
+      const raw = store.getItem(key);
+      if (!raw) continue;
+
+      if (/[âðÃÂ]/.test(raw)) {
+        try {
+          const parsed = JSON.parse(raw);
+          const cleanedObj = cleanDeep(parsed);
+          store.setItem(key, JSON.stringify(cleanedObj));
+          modifiedCount++;
+        } catch {
+          const cleanedStr = cleanMojibakeString(raw);
+          if (cleanedStr !== raw) {
+            store.setItem(key, cleanedStr);
+            modifiedCount++;
+          }
+        }
+      }
+    }
+
+    store.setItem(MIGRATION_FLAG_KEY, 'true');
+    return { migrated: true, count: modifiedCount };
+  } catch (e) {
+    console.error('[StorageService] Gagal migrasi UTF-8 localStorage:', e);
+    return { migrated: false, error: e };
+  }
+}
+
