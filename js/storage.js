@@ -1,6 +1,7 @@
 // storage.js — StorageService: CRUD ke LocalStorage, serialisasi JSON, data dummy
 
 import { AuthService } from './auth.js';
+import { normalizeTransaction, getSubcategory } from './categories.js';
 
 // KEYS lama dipertahankan sebagai fallback (dipakai saat tidak ada user login / test env)
 const KEYS = {
@@ -225,35 +226,33 @@ export const StorageService = {
   // ── Stok Telur ────────────────────────────────────────────────────────────
 
   /**
-   * Hitung sisa stok telur (butir).
-   *   Stok = Σ jumlahButir dari semua produksi
-   *          − Σ jumlahButir dari semua transaksi penjualan_telur
+   * Hitung sisa stok telur (butir) secara real-time.
+   *   Stok = Σ butir produksi
+   *          − Σ butir transaksi telur yang keluar (penjualan)
+   *          + Σ butir transaksi telur yang masuk (pembelian / retur)
    *
-   * jumlahButir pada produksi:  disimpan langsung di prod.jumlahButir
-   *   (fallback: prod.jumlahRak × isiPerRak jika jumlahButir tidak ada)
-   * jumlahButir pada transaksi: tx.jumlahButir
-   *   (fallback: tx.jumlahRak × isiPerRak jika jumlahButir tidak ada)
+   * Butir diambil dari `jumlahButir`, fallback `jumlahRak × isiPerRak`.
+   * Kategori telur dikenali lewat flag `isEgg` pada bagan kategori,
+   * jadi kategori telur baru otomatis ikut terhitung.
    *
    * @returns {number}
    */
   getStokTelur() {
     const { isiPerRak } = this.getSettings();
-    const productions   = this.getProductions();
-    const transactions  = this.getTransactions();
+    const butirOf = (r) =>
+      r.jumlahButir ?? (r.jumlahRak != null ? r.jumlahRak * isiPerRak : 0);
 
-    const totalProduksi = productions.reduce((sum, p) => {
-      const butir = p.jumlahButir ?? (p.jumlahRak * isiPerRak);
-      return sum + butir;
-    }, 0);
+    let stok = this.getProductions().reduce((sum, p) => sum + butirOf(p), 0);
 
-    const totalTerjual = transactions
-      .filter((t) => t.jenis === 'penjualan_telur')
-      .reduce((sum, t) => {
-        const butir = t.jumlahButir ?? (t.jumlahRak != null ? t.jumlahRak * isiPerRak : 0);
-        return sum + butir;
-      }, 0);
+    for (const tx of this.getTransactions()) {
+      const norm = normalizeTransaction(tx);
+      const sub  = getSubcategory(norm.kategori, norm.subKategori);
+      if (!sub?.isEgg) continue;
+      // type 'in' = penjualan telur (stok keluar); 'out' = pembelian/retur (stok masuk)
+      stok += sub.type === 'in' ? -butirOf(tx) : butirOf(tx);
+    }
 
-    return Math.max(0, totalProduksi - totalTerjual);
+    return Math.max(0, stok);
   },
 
   // ── Dummy Data & Utilities ────────────────────────────────────────────────

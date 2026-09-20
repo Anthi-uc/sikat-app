@@ -12,7 +12,7 @@ export function render(params = {}) {
     <div class="card" style="margin-bottom:var(--space-5);">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-3);">
         <div>
-          <p style="font-size:var(--font-size-2xl);font-weight:700;color:var(--color-primary);">v1.0.0</p>
+          <p style="font-size:var(--font-size-2xl);font-weight:700;color:var(--color-primary);">v1.1.0</p>
           <p style="font-size:var(--font-size-xs);color:var(--color-text-muted);">Rilis: September 2026</p>
         </div>
         <span class="badge badge-success" style="font-size:var(--font-size-sm);padding:var(--space-1) var(--space-3);">
@@ -26,18 +26,20 @@ export function render(params = {}) {
       <h3 style="font-size:var(--font-size-base);font-weight:700;margin-bottom:var(--space-4);">📦 Fitur yang Tersedia</h3>
       <ul style="display:flex;flex-direction:column;gap:var(--space-2);">
         ${[
-          'Input & simpan transaksi keuangan (pemasukan & pengeluaran)',
-          'Rekap kas dengan saldo otomatis dan riwayat transaksi',
-          'Laporan laba rugi dengan filter periode (minggu / bulan / tahun)',
-          'Grafik tren keuangan mingguan (penjualan vs biaya pakan)',
+          'Input transaksi dengan kategori bertingkat (penjualan, modal, persediaan, utang, kas, lainnya)',
+          'Kalkulasi otomatis Kuantitas × Harga Satuan → Total Nominal',
+          'Satuan jual telur per rak atau per butir (konversi 1 rak = 30 butir)',
+          'Rekap transaksi dengan saldo otomatis, navigasi bulanan, serta Edit & Hapus per baris',
+          'Produksi harian: input per rak atau per butir langsung + grafik tren bulanan',
+          'Stok telur real-time (produksi masuk, penjualan keluar, pembelian/retur masuk)',
+          'Laporan Keuangan 6 tab: Laba Rugi, Arus Kas, Neraca, CALK, Buku Kas, Cetak',
+          'Buku Kas: Debit, Kredit, saldo berjalan, tambah transaksi baru, Edit & Hapus',
+          'Pratinjau cetak PDF dengan kop surat resmi dan kolom tanda tangan',
           'Export laporan ke file Excel (.xlsx)',
-          'Pencatatan produksi telur harian (satuan Rak, konversi ke butir otomatis)',
-          'Grafik tren produksi 7 hari terakhir',
-          'Progressive Web App (PWA) — dapat diinstal di HP Android',
-          'Mode offline — semua data tersimpan lokal di perangkat',
-          'Pengaturan profil admin (nama + foto)',
-          'Splash screen dan navigasi SPA dengan hash routing',
-        ].map(f => `<li style="display:flex;gap:var(--space-2);align-items:flex-start;font-size:var(--font-size-sm);">
+          'Beranda: ringkasan bulanan, widget buku kas berjalan, dan pintasan laporan',
+          'Progressive Web App (PWA) — dapat diinstal di HP Android, mode offline',
+          'Pengaturan: profil admin, panduan, fitur & kebijakan, kontak, versi',
+                ].map(f => `<li style="display:flex;gap:var(--space-2);align-items:flex-start;font-size:var(--font-size-sm);">
           <span style="color:var(--color-primary);flex-shrink:0;">✓</span>
           <span>${f}</span>
         </li>`).join('')}

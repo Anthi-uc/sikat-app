@@ -3,6 +3,7 @@
 import { StorageService } from '../storage.js';
 import { CalculationEngine } from '../calculator.js';
 import { navigate } from '../router.js';
+import { isIncome, normalizeTransaction, findCategoryAndSub } from '../categories.js';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -16,8 +17,8 @@ function formatRupiah(angka) {
 }
 
 /**
- * Hitung ringkasan bulan.
- * penjualan_lain juga dihitung sebagai pemasukan.
+ * Hitung ringkasan bulan: pemasukan vs pengeluaran kas.
+ * Klasifikasi mengikuti bagan kategori (mendukung data legacy).
  */
 function getMonthStats(year, month) {
   const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
@@ -40,15 +41,108 @@ function getMonthStats(year, month) {
     const transactions = StorageService.getTransactions();
     for (const t of transactions) {
       if (!t.tanggal.startsWith(prefix)) continue;
-      if (t.jenis === 'penjualan_telur' || t.jenis === 'penjualan_lain') {
-        penjualan += t.nominal;
-      } else {
-        pengeluaran += t.nominal;
-      }
+      if (isIncome(t)) penjualan   += t.nominal;
+      else             pengeluaran += t.nominal;
     }
   } catch (e) { console.error('[Home] Gagal membaca data transaksi:', e); }
 
   return { produksiButir, penjualan, pengeluaran };
+}
+
+
+// ─── Widget: Buku Kas Berjalan ────────────────────────────────────────────────
+
+const _LAPORAN_SHORTCUTS = [
+  { tab: 'labarugi', icon: '📊', label: 'Laba Rugi' },
+  { tab: 'aruskas',  icon: '💸', label: 'Arus Kas'  },
+  { tab: 'neraca',   icon: '⚖️',  label: 'Neraca'    },
+  { tab: 'calk',     icon: '📝', label: 'CALK'      },
+  { tab: 'bukukas',  icon: '📒', label: 'Buku Kas'  },
+];
+
+function escH(s) {
+  return String(s ?? '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fDate(iso) {
+  if (!iso) return '-';
+  const [y, m, d] = String(iso).split('-');
+  return `${d}/${m}/${y}`;
+}
+
+/** Nama sub-kategori + keterangan untuk satu baris buku kas */
+function _txDesc(t) {
+  const norm = normalizeTransaction(t);
+  const sub  = findCategoryAndSub(norm.kategori, norm.subKategori)?.subcategory;
+  const nama = sub?.name ?? norm.subKategori ?? norm.jenis ?? 'Transaksi';
+  const ikon = sub?.icon ?? (isIncome(t) ? '💰' : '💸');
+  const ket  = norm.keterangan && norm.keterangan !== nama ? ` — ${escH(norm.keterangan)}` : '';
+  return `${ikon} ${escH(nama)}${ket}`;
+}
+
+/**
+ * 5 transaksi terakhir bulan yang dilihat + saldo berjalan (running balance),
+ * memakai sumber data yang sama dengan Buku Kas di Laporan Keuangan.
+ */
+function _buildBukuKasWidget(year, month) {
+  const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+  const txs = [...StorageService.getTransactions()].sort((a, b) =>
+    String(a.tanggal).localeCompare(String(b.tanggal)) ||
+    String(a.createdAt || '').localeCompare(String(b.createdAt || '')));
+
+  // Saldo awal bulan = akumulasi seluruh transaksi sebelum bulan ini
+  let saldo = txs
+    .filter(t => t.tanggal < prefix)
+    .reduce((s, t) => isIncome(t) ? s + (t.nominal || 0) : s - (t.nominal || 0), 0);
+
+  const rows = [];
+  for (const t of txs.filter(t => String(t.tanggal).startsWith(prefix))) {
+    const inc = isIncome(t);
+    saldo += inc ? (t.nominal || 0) : -(t.nominal || 0);
+    rows.push({ t, inc, saldo });
+  }
+
+  if (rows.length === 0) {
+    return `
+      <div class="empty-state">
+        <div class="empty-state-icon">📒</div>
+        <p class="empty-state-message">Belum ada transaksi bulan ini</p>
+      </div>`;
+  }
+
+  const last = rows.slice(-5).reverse();
+
+  return `
+    <div class="table-responsive">
+      <table class="laporan-table">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Keterangan</th>
+            <th class="text-right">Masuk</th>
+            <th class="text-right">Keluar</th>
+            <th class="text-right">Saldo</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${last.map(({ t, inc, saldo }) => `
+            <tr>
+              <td>${fDate(t.tanggal)}</td>
+              <td>${_txDesc(t)}</td>
+              <td class="text-right amount-income">${inc ? formatRupiah(t.nominal) : '—'}</td>
+              <td class="text-right amount-expense">${inc ? '—' : formatRupiah(t.nominal)}</td>
+              <td class="text-right" style="font-weight:700;color:${saldo >= 0 ? 'var(--color-teal)' : 'var(--color-danger)'}">
+                ${formatRupiah(saldo)}
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:var(--font-size-xs);color:var(--color-text-muted);margin-top:var(--space-2)">
+      Menampilkan ${last.length} dari ${rows.length} transaksi bulan ini.
+    </p>`;
 }
 
 // ─── Module-level state ───────────────────────────────────────────────────────
@@ -142,6 +236,26 @@ function _buildHTML() {
       </div>
     </section>
 
+    <section aria-label="Buku Kas Berjalan">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);margin-bottom:var(--space-3)">
+        <h3 style="${sh}margin-bottom:0;">Buku Kas Berjalan</h3>
+        <button class="btn btn-outline btn-sm" id="btn-lihat-bukukas">Lihat semua →</button>
+      </div>
+      <div class="card" id="home-bukukas-widget">
+        ${_buildBukuKasWidget(_viewYear, _viewMonth)}
+      </div>
+    </section>
+
+    <section aria-label="Pintasan Laporan Keuangan">
+      <h3 style="${sh}">Laporan Keuangan</h3>
+      <div class="quick-actions" style="flex-wrap:wrap">
+        ${_LAPORAN_SHORTCUTS.map(l => `
+          <button class="btn btn-outline btn-sm" data-laporan-tab="${l.tab}">
+            ${l.icon} ${l.label}
+          </button>`).join('')}
+      </div>
+    </section>
+
     <section aria-label="Menu Utama">
       <h3 style="${sh}">Menu</h3>
       <div class="menu-grid" role="list">
@@ -201,6 +315,9 @@ function _refreshSummary() {
     labaEl.style.color = laba >= 0 ? 'var(--color-teal)' : 'var(--color-danger)';
   }
 
+  const widget = document.getElementById('home-bukukas-widget');
+  if (widget) widget.innerHTML = _buildBukuKasWidget(_viewYear, _viewMonth);
+
   // Stok (always current, not month-filtered)
   const stok     = StorageService.getStokTelur();
   const settings = StorageService.getSettings();
@@ -244,4 +361,14 @@ export function attachListeners(params = {}) {
     navigate('#transaksi', { prefillJenis: 'penjualan_telur' });
   });
   document.getElementById('btn-catat-produksi')?.addEventListener('click', () => navigate('#produksi'));
+
+  document.getElementById('btn-lihat-bukukas')?.addEventListener('click', () => {
+    navigate('#labarugi', { tab: 'bukukas' });
+  });
+
+  document.querySelectorAll('[data-laporan-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      navigate('#labarugi', { tab: btn.getAttribute('data-laporan-tab') });
+    });
+  });
 }

@@ -73,11 +73,21 @@ function escHtml(s) {
 const NAV_ITEMS = [
   { hash: '#home',      icon: '🏠', label: 'Beranda' },
   { hash: '#transaksi', icon: '➕', label: 'Input Transaksi' },
-  { hash: '#rekap',     icon: '👛', label: 'Rekap Kas' },
+  { hash: '#rekap',     icon: '👛', label: 'Rekap Transaksi' },
   { hash: '#produksi',  icon: '🥚', label: 'Produksi Harian' },
   { hash: '#labarugi',  icon: '📊', label: 'Laporan Keuangan' },
-  { hash: '#profil',    icon: '⚙️', label: 'Pengaturan' },
 ];
+
+// Sub-menu Pengaturan (dibuka/ditutup lewat <details>, tanpa JS tambahan)
+const PENGATURAN_ITEMS = [
+  { hash: '#profil',    icon: '👤', label: 'Profil' },
+  { hash: '#panduan',   icon: '📖', label: 'Panduan' },
+  { hash: '#kebijakan', icon: '📋', label: 'Fitur & Kebijakan' },
+  { hash: '#kontak',    icon: '✉️', label: 'Kontak' },
+  { hash: '#versi',     icon: 'ℹ️', label: 'Versi Aplikasi' },
+];
+
+const PENGATURAN_HASHES = PENGATURAN_ITEMS.map(i => i.hash);
 
 // ─── Sidebar (desktop/tablet) ─────────────────────────────────────────────────
 
@@ -91,6 +101,15 @@ export function renderSidebar(activeHash = '#home') {
   const avatarInner = foto
     ? `<span style="display:block;width:38px;height:38px;border-radius:50%;background-image:url('${foto}');background-size:cover;background-position:center;"></span>`
     : `<img src="${DEFAULT_AVATAR_SVG}" alt="Avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">`;
+
+  const isPengaturanActive = PENGATURAN_HASHES.includes(activeHash);
+
+  const pengaturanHTML = PENGATURAN_ITEMS.map(item => `
+    <button class="sidebar-nav-item sidebar-subnav-item${activeHash === item.hash ? ' active' : ''}"
+            data-hash="${item.hash}" aria-current="${activeHash === item.hash ? 'page' : 'false'}">
+      <span class="nav-icon" aria-hidden="true">${item.icon}</span>
+      <span>${item.label}</span>
+    </button>`).join('');
 
   const navItemsHTML = NAV_ITEMS.map(item => `
     <button class="sidebar-nav-item${activeHash === item.hash ? ' active' : ''}"
@@ -122,6 +141,14 @@ export function renderSidebar(activeHash = '#home') {
       <p class="sidebar-section-label">Menu Utama</p>
       <nav class="sidebar-nav" aria-label="Menu utama">
         ${navItemsHTML}
+
+        <details class="sidebar-group" id="sidebar-pengaturan"${isPengaturanActive ? ' open' : ''}>
+          <summary class="sidebar-nav-item">
+            <span class="nav-icon" aria-hidden="true">⚙️</span>
+            <span>Pengaturan</span>
+          </summary>
+          ${pengaturanHTML}
+        </details>
       </nav>
 
       <div class="sidebar-divider"></div>
@@ -170,6 +197,10 @@ export function renderSidebar(activeHash = '#home') {
  * @param {string} hash
  */
 export function setSidebarActive(hash) {
+  // Buka grup Pengaturan bila rute aktif ada di dalamnya
+  const group = document.getElementById('sidebar-pengaturan');
+  if (group && PENGATURAN_HASHES.includes(hash)) group.open = true;
+
   document.querySelectorAll('#sidebar-container .sidebar-nav-item[data-hash]').forEach(btn => {
     const isActive = btn.getAttribute('data-hash') === hash;
     btn.classList.toggle('active', isActive);
