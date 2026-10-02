@@ -28,12 +28,12 @@ const _BULAN_NAMA = [
 ];
 
 const _TABS = [
-  { id: 'labarugi',  icon: '📊', label: 'Laba Rugi'  },
-  { id: 'aruskas',   icon: '💸', label: 'Arus Kas'   },
-  { id: 'neraca',    icon: '⚖️',  label: 'Neraca'     },
-  { id: 'calk',      icon: '📝', label: 'CALK'       },
-  { id: 'bukukas',   icon: '📒', label: 'Buku Kas'   },
-  { id: 'cetak',     icon: '🖨️',  label: 'Cetak'      },
+  { id: 'labarugi',  label: 'Laba Rugi'  },
+  { id: 'aruskas',   label: 'Arus Kas'   },
+  { id: 'neraca',    label: 'Neraca'     },
+  { id: 'calk',      label: 'CALK'       },
+  { id: 'bukukas',   label: 'Buku Kas'   },
+  { id: 'cetak',     label: 'Cetak'      },
 ];
 
 function fRp(n) {
@@ -68,14 +68,13 @@ function sortOldest(arr) {
 function getTxDisplayInfo(t) {
   const norm = normalizeTransaction(t);
   const matched = findCategoryAndSub(norm.kategori, norm.subKategori);
-  const icon = matched?.subcategory?.icon || (isIncome(norm) ? '💰' : '💸');
   const catName = matched?.subcategory?.name || norm.subKategori || norm.jenis || 'Transaksi';
-  let desc = `${icon} ${catName}`;
+  let desc = catName;
   if (norm.keterangan && norm.keterangan !== catName) {
     desc += ` — ${norm.keterangan}`;
   }
   return {
-    icon,
+    icon: '',
     catName,
     desc,
     kategori: norm.kategori,
@@ -120,10 +119,10 @@ function toolbarHTML(tabId, bulanLabel) {
       <div></div>
       <div class="laporan-toolbar-right">
         <button class="btn btn-outline btn-sm" id="btn-export-excel-${tabId}" title="Export ke Excel">
-          📥 Excel
+          Excel
         </button>
         <button class="btn btn-primary btn-sm" id="btn-cetak-${tabId}" title="Cetak laporan ini">
-          🖨️ Cetak
+          Cetak
         </button>
       </div>
     </div>`;
@@ -171,12 +170,11 @@ export function render(params = {}) {
     <button class="laporan-tab-btn${_activeTab === t.id ? ' active' : ''}"
             data-tab="${t.id}" aria-selected="${_activeTab === t.id}"
             role="tab" aria-controls="panel-${t.id}">
-      ${t.icon} ${t.label}
+      ${t.label}
     </button>`).join('');
 
   return `
     <div class="welcome-card">
-      <div class="icon">📋</div>
       <h2>Laporan Keuangan</h2>
       <p>BUMKam Torei Natei — Sistem Informasi Kas Ayam Ternak</p>
     </div>
@@ -224,7 +222,7 @@ function _renderLabarugi() {
       ${toolbarHTML('labarugi', bulanLabel)}
       ${monthNavHTML('lr', _lrYear, _lrMonth, _now.getFullYear(), _now.getMonth())}
 
-      <p class="laporan-section-title">📊 Laba Rugi — ${bulanLabel}</p>
+      <p class="laporan-section-title">Laba Rugi — ${bulanLabel}</p>
 
       <div class="laporan-table-wrap table-responsive">
         <table class="laporan-table">
@@ -298,7 +296,7 @@ function _renderLabarugi() {
       </div>
 
       <!-- Chart -->
-      <p class="laporan-section-title no-print">📈 Grafik Pendapatan vs Beban (4 Bulan)</p>
+      <p class="laporan-section-title no-print">Grafik Pendapatan vs Beban (4 Bulan)</p>
       <div class="chart-container no-print" style="height:220px">
         <canvas id="chart-lr" aria-label="Grafik Laba Rugi"></canvas>
       </div>
@@ -349,7 +347,7 @@ function _renderArusKas() {
       ${toolbarHTML('aruskas', bulanLabel)}
       ${monthNavHTML('ak', _akYear, _akMonth, _now.getFullYear(), _now.getMonth())}
 
-      <p class="laporan-section-title">💸 Arus Kas — ${bulanLabel}</p>
+      <p class="laporan-section-title">Arus Kas — ${bulanLabel}</p>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:var(--space-3);margin-bottom:var(--space-4)">
         <div class="summary-box" style="padding:var(--space-3)">
@@ -402,7 +400,7 @@ function _renderArusKas() {
       </div>
 
       ${isEmpty
-        ? '<div class="empty-state"><div class="empty-state-icon">💸</div><p class="empty-state-message">Belum ada transaksi arus kas bulan ini</p></div>'
+        ? '<div class="empty-state"><p class="empty-state-message">Belum ada transaksi arus kas bulan ini</p></div>'
         : `<div class="laporan-table-wrap table-responsive">
             <table class="laporan-table" id="tabel-aruskas">
               <thead>
@@ -450,11 +448,11 @@ function _renderNeraca() {
       ${toolbarHTML('neraca', bulanLabel)}
       ${monthNavHTML('ne', _neYear, _neMonth, _now.getFullYear(), _now.getMonth())}
 
-      <p class="laporan-section-title">⚖️ Neraca — per akhir ${bulanLabel}</p>
+      <p class="laporan-section-title">Neraca — per akhir ${bulanLabel}</p>
 
       <!-- Indikator Keseimbangan Akuntansi -->
       <div class="neraca-balance-badge ${ne.balance ? 'balance-ok' : 'balance-diff'}">
-        <span>${ne.balance ? '✅' : '⚠️'}</span>
+        
         <div>
           <strong>${ne.balance ? 'Neraca Seimbang (Balance)' : 'Neraca Belum Seimbang'}</strong>
           <p style="margin:0;font-size:var(--font-size-xs);opacity:0.9;">
@@ -565,7 +563,7 @@ function _renderCalk() {
       ${toolbarHTML('calk', bulanLabel)}
       ${monthNavHTML('calk', _calkYear, _calkMonth, _now.getFullYear(), _now.getMonth())}
 
-      <p class="laporan-section-title">📝 CALK — ${bulanLabel}</p>
+      <p class="laporan-section-title">CALK — ${bulanLabel}</p>
       <ul class="calk-list" id="calk-list">${listHTML}</ul>
 
       <div class="print-only">${ttdHTML()}</div>
@@ -614,8 +612,8 @@ function _renderBukuKas() {
         <td class="text-right ${sc}">${fRp(saldo)}</td>
         <td class="no-print">
           <div class="buku-kas-actions">
-            <button class="btn-edit-tx"   data-id="${escH(t.id)}" title="Edit Transaksi">✏️</button>
-            <button class="btn-delete-tx" data-id="${escH(t.id)}" title="Hapus Transaksi">🗑️</button>
+            <button class="btn-edit-tx"   data-id="${escH(t.id)}" title="Edit Transaksi">Edit</button>
+            <button class="btn-delete-tx" data-id="${escH(t.id)}" title="Hapus Transaksi">Hapus</button>
           </div>
         </td>
       </tr>`;
@@ -629,7 +627,7 @@ function _renderBukuKas() {
       ${monthNavHTML('bk', _bkYear, _bkMonth, _now.getFullYear(), _now.getMonth())}
 
       <div class="laporan-toolbar no-print" style="margin-top:0;margin-bottom:var(--space-3)">
-        <button class="btn btn-primary btn-sm" id="btn-tambah-bk">➕ Tambah Transaksi Baru</button>
+        <button class="btn btn-primary btn-sm" id="btn-tambah-bk">Tambah Transaksi Baru</button>
         <span style="font-size:var(--font-size-xs);color:var(--color-text-muted)">
           Saldo Awal Bulan: <strong>${fRp(saldoAwal)}</strong>
         </span>
@@ -638,10 +636,10 @@ function _renderBukuKas() {
       <!-- Slot Form Transaksi Bersama (Tambah / Edit) -->
       <div id="bk-edit-slot"></div>
 
-      <p class="laporan-section-title">📒 Buku Kas — ${bulanLabel}</p>
+      <p class="laporan-section-title">Buku Kas — ${bulanLabel}</p>
 
       ${monthTxs.length === 0
-        ? '<div class="empty-state"><div class="empty-state-icon">📒</div><p class="empty-state-message">Belum ada transaksi bulan ini</p></div>'
+        ? '<div class="empty-state"><p class="empty-state-message">Belum ada transaksi bulan ini</p></div>'
         : `<div class="laporan-table-wrap table-responsive">
             <table class="laporan-table" id="tabel-bukukas">
               <thead>
@@ -679,7 +677,7 @@ function _renderBukuKas() {
 
 function _renderCetak() {
   return `
-    <p class="laporan-section-title">🖨️ Pratinjau &amp; Cetak Laporan</p>
+    <p class="laporan-section-title">Pratinjau &amp; Cetak Laporan</p>
     <p style="color:var(--color-text-muted);font-size:var(--font-size-sm);margin-bottom:var(--space-5)">
       Pilih laporan yang ingin dicetak, lalu klik tombol Cetak. 
       Halaman akan membuka dialog cetak browser. Pilih "Simpan sebagai PDF" untuk menyimpan file laporan.
@@ -687,11 +685,11 @@ function _renderCetak() {
 
     <div style="display:grid;gap:var(--space-3)">
       ${[
-        { tab: 'labarugi', label: '📊 Laba Rugi', desc: 'Laporan pendapatan, beban operasional, dan laba/rugi bersih' },
-        { tab: 'aruskas',  label: '💸 Arus Kas',  desc: 'Laporan pergerakan kas operasi, investasi, dan pendanaan' },
-        { tab: 'neraca',   label: '⚖️ Neraca',    desc: 'Laporan posisi aset, kewajiban, dan ekuitas' },
-        { tab: 'calk',     label: '📝 CALK',      desc: 'Catatan atas Laporan Keuangan standar BUMKam' },
-        { tab: 'bukukas',  label: '📒 Buku Kas',  desc: 'Buku kas umum per transaksi dengan saldo berjalan' },
+        { tab: 'labarugi', label: 'Laba Rugi', desc: 'Laporan pendapatan, beban operasional, dan laba/rugi bersih' },
+        { tab: 'aruskas',  label: 'Arus Kas',  desc: 'Laporan pergerakan kas operasi, investasi, dan pendanaan' },
+        { tab: 'neraca',   label: 'Neraca',    desc: 'Laporan posisi aset, kewajiban, dan ekuitas' },
+        { tab: 'calk',     label: 'CALK',      desc: 'Catatan atas Laporan Keuangan standar BUMKam' },
+        { tab: 'bukukas',  label: 'Buku Kas',  desc: 'Buku kas umum per transaksi dengan saldo berjalan' },
       ].map(item => `
         <div style="display:flex;align-items:center;justify-content:space-between;
                     background:var(--color-bg);border:1px solid var(--color-border);
@@ -701,7 +699,7 @@ function _renderCetak() {
             <p style="font-size:var(--font-size-xs);color:var(--color-text-muted)">${item.desc}</p>
           </div>
           <button class="btn btn-primary btn-sm btn-goto-print" data-tab="${item.tab}"
-                  style="flex-shrink:0">🖨️ Cetak</button>
+                  style="flex-shrink:0">Cetak</button>
         </div>`).join('')}
     </div>`;
 }
@@ -1054,7 +1052,7 @@ function _listenBukuKas() {
       },
       mode: 'inline',
       showCancel: true,
-      submitLabel: '💾 Simpan Transaksi',
+      submitLabel: 'Simpan Transaksi',
     });
 
     slot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1100,7 +1098,7 @@ function _attachBkTableListeners(tbody) {
           initialData: tx,
           mode: 'inline',
           showCancel: true,
-          submitLabel: '💾 Simpan Perubahan',
+          submitLabel: 'Simpan Perubahan',
         });
 
         slot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });

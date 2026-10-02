@@ -13,10 +13,46 @@ function genId() {
 }
 
 /**
- * Hash sederhana (non-kriptografis) untuk password offline.
- * Cukup untuk mencegah tampilan plain-text di localStorage.
+ * Salt tetap untuk hashing offline-first di browser.
  */
-function hashPassword(password) {
+const AUTH_SALT = 'sikat_bumkam_torei_natei_v1';
+
+/**
+ * Hash password menggunakan Web Crypto API (SHA-256) dengan salt.
+ * Memiliki fallback jika Web Crypto tidak tersedia.
+ * @param {string} password
+ * @param {string} [salt]
+ * @returns {Promise<string>}
+ */
+export async function hashPassword(password, salt = AUTH_SALT) {
+  if (typeof crypto !== 'undefined' && crypto.subtle && typeof TextEncoder !== 'undefined') {
+    try {
+      const enc = new TextEncoder();
+      const data = enc.encode(`${salt}:${password}`);
+      const hashBuf = await crypto.subtle.digest('SHA-256', data);
+      const hashArr = Array.from(new Uint8Array(hashBuf));
+      return hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch {
+      // Fallback below
+    }
+  }
+  return legacyHashPassword(password, salt);
+}
+
+function legacyHashPassword(password, salt = AUTH_SALT) {
+  let h = 0x811c9dc5;
+  const combined = `${salt}:${password}`;
+  for (let i = 0; i < combined.length; i++) {
+    h ^= combined.charCodeAt(i);
+    h = (h * 0x01000193) >>> 0;
+  }
+  return 'sha_fallback_' + h.toString(16).padStart(8, '0');
+}
+
+/**
+ * Hash lama (v1 tanpa salt) untuk kompatibilitas akun lama
+ */
+function oldV1HashPassword(password) {
   let h = 0x811c9dc5;
   for (let i = 0; i < password.length; i++) {
     h ^= password.charCodeAt(i);
@@ -58,32 +94,42 @@ export const AuthService = {
   // ── Register ───────────────────────────────────────────────────────────────
   /**
    * @param {{ email, password, namaAdmin, namaUsaha }} data
-   * @returns {{ ok: boolean, error?: string, user?: object }}
+   * @returns {Promise<{ ok: boolean, error?: string, field?: string, user?: object }>}
    */
-  register(data) {
+  async register(data) {
     const { email, password, namaAdmin, namaUsaha } = data;
 
-    if (!email || !password || !namaAdmin) {
-      return { ok: false, error: 'Email, password, dan nama admin wajib diisi.' };
+    if (!namaAdmin || !namaAdmin.trim()) {
+      return { ok: false, error: 'Nama admin / peternak wajib diisi.', field: 'namaAdmin' };
+    }
+    if (!email || !email.trim()) {
+      return { ok: false, error: 'Email wajib diisi.', field: 'email' };
+    }
+    const cleanEmail = email.toLowerCase().trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      return { ok: false, error: 'Format email tidak valid (contoh: nama@domain.com).', field: 'email' };
+    }
+    if (!password) {
+      return { ok: false, error: 'Password wajib diisi.', field: 'password' };
     }
     if (password.length < 6) {
-      return { ok: false, error: 'Password minimal 6 karakter.' };
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return { ok: false, error: 'Format email tidak valid.' };
+      return { ok: false, error: 'Password minimal 6 karakter.', field: 'password' };
     }
 
     const users = this.getUsers();
-    if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-      return { ok: false, error: 'Email sudah terdaftar. Silakan login.' };
+    if (users.find(u => u.email.toLowerCase() === cleanEmail)) {
+      return { ok: false, error: 'Akun sudah terdaftar. Silakan login.', field: 'email' };
     }
+
+    const hashedPassword = await hashPassword(password);
+    const finalNamaUsaha = (namaUsaha && namaUsaha.trim()) ? namaUsaha.trim() : 'BUMKam Torei Natei';
 
     const user = {
       id:        genId(),
-      email:     email.toLowerCase().trim(),
-      password:  hashPassword(password),
+      email:     cleanEmail,
+      password:  hashedPassword,
       namaAdmin: namaAdmin.trim(),
-      namaUsaha: (namaUsaha || 'BUMKam Torei Natei').trim(),
+      namaUsaha: finalNamaUsaha,
       alamat:    'Kampung Yakonde, Papua',
       whatsapp:  '',
       emailUsaha:'',
@@ -94,30 +140,58 @@ export const AuthService = {
     users.push(user);
     this._saveUsers(users);
     this._setSession(user);
+
+    // Simpan data usaha dan admin ke Pengaturan > Profil
+    try {
+      localStorage.setItem('sikat_profil_nama', user.namaAdmin);
+      localStorage.setItem('sikat_profil_usaha', user.namaUsaha);
+    } catch {}
+
     return { ok: true, user };
   },
 
   // ── Login ──────────────────────────────────────────────────────────────────
   /**
    * @param {{ email, password }} data
-   * @returns {{ ok: boolean, error?: string, user?: object }}
+   * @returns {Promise<{ ok: boolean, error?: string, field?: string, user?: object }>}
    */
-  login(data) {
+  async login(data) {
     const { email, password } = data;
-    if (!email || !password) {
-      return { ok: false, error: 'Email dan password wajib diisi.' };
+    if (!email || !email.trim()) {
+      return { ok: false, error: 'Email wajib diisi.', field: 'email' };
+    }
+    const cleanEmail = email.toLowerCase().trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      return { ok: false, error: 'Format email tidak valid (contoh: nama@domain.com).', field: 'email' };
+    }
+    if (!password) {
+      return { ok: false, error: 'Password wajib diisi.', field: 'password' };
     }
 
     const users = this.getUsers();
-    const user = users.find(u => u.email === email.toLowerCase().trim());
+    const user = users.find(u => u.email === cleanEmail);
     if (!user) {
-      return { ok: false, error: 'Email tidak ditemukan.' };
+      return { ok: false, error: 'Email atau password salah.', field: 'password' };
     }
-    if (user.password !== hashPassword(password)) {
-      return { ok: false, error: 'Password salah.' };
+
+    const hashedInput = await hashPassword(password);
+    const isValid = (user.password === hashedInput) || (user.password === oldV1HashPassword(password));
+    if (!isValid) {
+      return { ok: false, error: 'Email atau password salah.', field: 'password' };
+    }
+
+    // Jika user memakai hash lama, upgrade ke SHA-256 dengan salt
+    if (user.password !== hashedInput) {
+      user.password = hashedInput;
+      this._saveUsers(users);
     }
 
     this._setSession(user);
+    try {
+      if (user.namaAdmin) localStorage.setItem('sikat_profil_nama', user.namaAdmin);
+      if (user.namaUsaha) localStorage.setItem('sikat_profil_usaha', user.namaUsaha);
+    } catch {}
+
     return { ok: true, user };
   },
 

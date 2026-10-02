@@ -112,6 +112,15 @@ export function navigate(hash, params = {}) {
     params = {};
   }
 
+  const isAuthRoute = PUBLIC_ROUTES.has(hash);
+  if (typeof document !== 'undefined' && document.body) {
+    if (isAuthRoute) {
+      document.body.classList.add('auth-page');
+    } else {
+      document.body.classList.remove('auth-page');
+    }
+  }
+
   const renderFn = ROUTES[hash] ?? render404;
 
   // Render the view
@@ -163,6 +172,15 @@ window.addEventListener('hashchange', () => {
 window.addEventListener('popstate', (e) => {
   const hash = e.state?.hash || location.hash || '#home';
   const params = e.state?.params || {};
+
+  const isAuthRoute = PUBLIC_ROUTES.has(hash);
+  if (typeof document !== 'undefined' && document.body) {
+    if (isAuthRoute) {
+      document.body.classList.add('auth-page');
+    } else {
+      document.body.classList.remove('auth-page');
+    }
+  }
 
   // Re-render WITHOUT pushing to history again
   const renderFn = ROUTES[hash] ?? render404;

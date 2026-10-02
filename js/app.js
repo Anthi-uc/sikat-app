@@ -158,7 +158,7 @@ export function renderSidebar(activeHash = '#home') {
     if (confirm('Yakin ingin keluar dari SIKAT?')) {
       import('./auth.js').then(({ AuthService }) => {
         AuthService.logout();
-        renderHeader({ authMode: true });
+        document.body.classList.add('auth-page');
         navigate('#login');
       });
     }
@@ -374,14 +374,14 @@ function initApp() {
 
     import('./auth.js').then(({ AuthService }) => {
       if (!AuthService.isLoggedIn()) {
-        // Auth mode: show minimal mobile header, hide sidebar + bottom nav
-        renderHeader({ authMode: true });
+        document.body.classList.add('auth-page');
         document.getElementById('bottom-nav')?.setAttribute('hidden', '');
         navigate('#login');
         return;
       }
 
       // Logged in — render full navigation
+      document.body.classList.remove('auth-page');
       renderHeader();
       renderSidebar('#home');
       renderBottomNav('#home');
@@ -405,7 +405,9 @@ function initApp() {
   setTimeout(() => { clearTimeout(splashTimeout); afterSplash(); }, 1500);
 }
 
-if (document.readyState === 'loading') {
+if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'test') {
+  // Unit test runner environment — do not auto-run app initialization
+} else if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initApp);
 } else {
   initApp();
