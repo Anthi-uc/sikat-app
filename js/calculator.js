@@ -327,6 +327,82 @@ export const CalculationEngine = {
    * Dapatkan batas minggu berjalan: Senin (start) dan Minggu (end) dalam waktu lokal.
    * @returns {{ start: Date, end: Date }}
    */
+
+  /**
+   * Data grafik Pendapatan vs Beban untuk satu bulan, dikelompokkan per MINGGU.
+   * Setiap titik = satu rentang minggu dalam bulan tersebut (Senin-Minggu).
+   * Nilai penjualan & beban SAMA PERSIS dengan calculateLabaRugi untuk bulan yang sama.
+   *
+   * @param {Array}  transactions  - semua transaksi
+   * @param {number} year          - tahun (misal 2026)
+   * @param {number} month         - bulan 0-indexed (0=Jan)
+   * @returns {{ label: string, totalPendapatan: number, totalBeban: number }[]}
+   */
+  getDataGrafikBulanan(transactions, year, month) {
+    const pfx      = `${year}-${String(month + 1).padStart(2, '0')}`;
+    const monthTxs = (transactions || []).filter(t => t.tanggal && t.tanggal.startsWith(pfx));
+
+    if (monthTxs.length === 0) return [];
+
+    // Helper: determine the week-group label for a date in this month
+    // We split the month into ISO-week-sized buckets that fall within the month.
+    // Label: "DD/MM - DD/MM" (Monday to Sunday of that week, clamped to month boundaries)
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const monthStart  = `${pfx}-01`;
+    const monthEnd    = `${pfx}-${String(daysInMonth).padStart(2, '0')}`;
+
+    // Build week buckets: each bucket is the Monday-of-week that contains at least one day in this month
+    const bucketMap = new Map(); // key = mondayStr, value = { label, totalPendapatan, totalBeban }
+
+    for (const t of monthTxs) {
+      const monday = getMondayOfWeek(t.tanggal);
+      if (!bucketMap.has(monday)) {
+        // Clamp labels to month boundaries
+        const bucketStart = monday < monthStart ? monthStart : monday;
+        const sunday      = getSundayOfWeek(monday);
+        const bucketEnd   = sunday > monthEnd ? monthEnd : sunday;
+        const label       = `${formatDDMM(bucketStart)} - ${formatDDMM(bucketEnd)}`;
+        bucketMap.set(monday, { label, totalPendapatan: 0, totalBeban: 0 });
+      }
+
+      const bucket = bucketMap.get(monday);
+
+      // Use the same logic as calculateLabaRugi for income/expense classification
+      const jenis = t.jenis || '';
+      if (jenis === 'penjualan_telur' || jenis === 'penjualan_lain') {
+        bucket.totalPendapatan += (t.nominal || 0);
+      } else if (
+        jenis === 'pembelian_pakan' ||
+        jenis === 'biaya_lain' ||
+        jenis === 'biaya_obat' ||
+        jenis === 'biaya_perlengkapan' ||
+        jenis === 'biaya_sanitasi'
+      ) {
+        bucket.totalBeban += (t.nominal || 0);
+      } else {
+        // Fallback: COA-based classification
+        try {
+          const norm = typeof normalizeTransaction === 'function'
+            ? normalizeTransaction(t) : t;
+          const { sub } = (typeof findJournalEntries === 'function')
+            ? findJournalEntries(norm) || {}
+            : {};
+          const creditCode = sub?.creditAccount?.code || '';
+          const debitCode  = sub?.debitAccount?.code  || '';
+          if (creditCode && creditCode.startsWith('4-')) {
+            bucket.totalPendapatan += (t.nominal || 0);
+          } else if (debitCode && debitCode.startsWith('5-')) {
+            bucket.totalBeban += (t.nominal || 0);
+          }
+        } catch (_) { /* ignore COA lookup errors */ }
+      }
+    }
+
+    // Sort buckets chronologically by Monday date
+    return [...bucketMap.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, v]) => v);
+  },
   getBatasMingguBerjalan() {
     const now = new Date();
     const dayOfWeek = (now.getDay() + 6) % 7; // 0=Mon, 6=Sun

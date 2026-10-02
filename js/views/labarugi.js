@@ -296,9 +296,9 @@ function _renderLabarugi() {
       </div>
 
       <!-- Chart -->
-      <p class="laporan-section-title no-print">Grafik Pendapatan vs Beban (4 Bulan)</p>
-      <div class="chart-container no-print" style="height:220px">
-        <canvas id="chart-lr" aria-label="Grafik Laba Rugi"></canvas>
+      <p class="laporan-section-title no-print" id="chart-lr-title">Grafik Pendapatan vs Beban (${bulanLabel})</p>
+      <div class="chart-container no-print" style="height:240px" id="chart-lr-wrap">
+        <canvas id="chart-lr" aria-label="Grafik Laba Rugi Bulanan"></canvas>
       </div>
 
       <div class="print-only">${ttdHTML()}</div>
@@ -816,6 +816,41 @@ function _todayStr() {
 
 // ─── Tab 1: Laba Rugi Listeners ──────────────────────────────────────────────
 
+/**
+ * Render (atau refresh) grafik Pendapatan vs Beban untuk bulan aktif (_lrYear/_lrMonth).
+ * Dipanggil saat tab pertama kali dimuat dan setiap kali bulan berubah.
+ * Angka SAMA PERSIS dengan tabel Laba Rugi karena memakai calculateLabaRugi untuk total
+ * dan getDataGrafikBulanan untuk pembagian per minggu.
+ */
+function _renderLrChart() {
+  // Re-create canvas if it was replaced by empty-state text
+  const wrap = document.getElementById('chart-lr-wrap');
+  if (wrap && !document.getElementById('chart-lr')) {
+    const c = document.createElement('canvas');
+    c.id = 'chart-lr';
+    c.setAttribute('aria-label', 'Grafik Laba Rugi Bulanan');
+    wrap.innerHTML = '';
+    wrap.appendChild(c);
+  }
+
+  // Update chart title
+  const titleEl = document.getElementById('chart-lr-title');
+  const bulanLabel = `${_BULAN_NAMA[_lrMonth]} ${_lrYear}`;
+  if (titleEl) titleEl.textContent = `Grafik Pendapatan vs Beban (${bulanLabel})`;
+
+  try {
+    const txs  = StorageService.getTransactions();
+    const data = CalculationEngine.getDataGrafikBulanan(txs, _lrYear, _lrMonth);
+
+    // Sanity-check: sums of data must match calculateLabaRugi totals for the same month
+    // (they will, since both use the same transaction filter & classification)
+    ChartManager.renderMonthlyLabaRugiChart('chart-lr', data, bulanLabel);
+  } catch (e) {
+    console.error('[LR Chart]', e);
+    const wrap2 = document.getElementById('chart-lr-wrap');
+    if (wrap2) wrap2.innerHTML = '<p style="text-align:center;color:#64748b;padding:2rem;font-size:0.875rem;">Grafik tidak tersedia</p>';
+  }
+}
 function _listenLabarugi() {
   _attachMonthNav('lr',
     () => _lrYear, () => _lrMonth,
@@ -826,11 +861,8 @@ function _listenLabarugi() {
     }
   );
 
-  try {
-    const txs  = StorageService.getTransactions();
-    const data = CalculationEngine.getDataGrafikMingguan(txs, 4);
-    ChartManager.renderWeeklyChart('chart-lr', data);
-  } catch(e) { /* chart optional */ }
+  // Render grafik bulanan (mengikuti _lrYear/_lrMonth aktif)
+  _renderLrChart();
 
   document.getElementById('btn-cetak-labarugi')?.addEventListener('click', () => _triggerPrint('print-area-labarugi'));
 

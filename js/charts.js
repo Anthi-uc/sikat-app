@@ -146,4 +146,111 @@ export const ChartManager = {
     _charts[canvasId] = chart;
     return chart;
   },
+
+  /**
+   * Render grafik Pendapatan vs Beban untuk SATU BULAN.
+   * Data dikelompokkan per minggu; sumbu Y berformat Rupiah.
+   * Jika data kosong, tampilkan pesan "Belum ada data".
+   *
+   * @param {string} canvasId
+   * @param {{ label: string, totalPendapatan: number, totalBeban: number }[]} data
+   * @param {string} bulanLabel  – dipakai sebagai judul legend (mis. "September 2026")
+   * @returns {Chart|null}
+   */
+  renderMonthlyLabaRugiChart(canvasId, data, bulanLabel) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return null;
+
+    // Destroy stale instance
+    this.destroyChart(canvasId);
+
+    // Empty-state: replace canvas with message
+    const parent = canvas.parentElement;
+    if (!data || data.length === 0) {
+      if (parent) {
+        parent.innerHTML = `<p style="text-align:center;color:#64748b;padding:2rem 1rem;font-size:0.875rem;">
+          Belum ada data pada periode ini</p>`;
+      }
+      return null;
+    }
+
+    // Re-insert canvas if we previously replaced it with text
+    if (!document.getElementById(canvasId)) {
+      if (parent) {
+        const c = document.createElement('canvas');
+        c.id        = canvasId;
+        c.setAttribute('aria-label', 'Grafik Laba Rugi Bulanan');
+        parent.innerHTML = '';
+        parent.appendChild(c);
+      }
+      return null; // will be rendered next tick
+    }
+
+    if (typeof window === 'undefined' || typeof window.Chart === 'undefined') {
+      if (parent) parent.innerHTML = '<p style="text-align:center;color:#64748b;padding:2rem;">Grafik tidak tersedia</p>';
+      return null;
+    }
+
+    const chart = new window.Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: data.map(d => d.label),
+        datasets: [
+          {
+            label: 'Total Pendapatan',
+            data: data.map(d => d.totalPendapatan),
+            backgroundColor: 'rgba(13,148,136,0.75)',
+            borderColor: '#0d9488',
+            borderWidth: 1.5,
+            borderRadius: 4,
+          },
+          {
+            label: 'Total Beban',
+            data: data.map(d => d.totalBeban),
+            backgroundColor: 'rgba(220,38,38,0.65)',
+            borderColor: '#dc2626',
+            borderWidth: 1.5,
+            borderRadius: 4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true, position: 'top' },
+          title: {
+            display: false,
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label(ctx) {
+                return `${ctx.dataset.label}: Rp ${Number(ctx.parsed.y).toLocaleString('id-ID')}`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            ticks: { maxRotation: 0, font: { size: 11 } },
+            grid: { display: false },
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (v) => 'Rp ' + Number(v).toLocaleString('id-ID'),
+              font: { size: 11 },
+              maxTicksLimit: 6,
+            },
+            grid: { color: 'rgba(0,0,0,0.06)' },
+          },
+        },
+      },
+    });
+
+    _charts[canvasId] = chart;
+    return chart;
+  },
 };

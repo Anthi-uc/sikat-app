@@ -1,7 +1,7 @@
 // sw.js — Service Worker SIKAT
 // Strategy: Cache-First for static assets, fallback to network
 
-const CACHE_NAME = 'sikat-v2.3';
+const CACHE_NAME = 'sikat-v2.4';
 
 const STATIC_ASSETS = [
   './',
