@@ -1,3 +1,4 @@
+import { getProfilEscaped } from '../profil-usaha.js';
 // versi.js — Halaman Versi Aplikasi
 
 export function render(params = {}) {
@@ -68,7 +69,7 @@ export function render(params = {}) {
     <!-- Copyright -->
     <div class="card" style="text-align:center;">
       <p style="font-size:var(--font-size-xs);color:var(--color-text-muted);">
-        &copy; 2026 BUMKam Torei Natei &bull; SIKAT &bull; Sistem Informasi Kas Ayam Ternak
+        &copy; 2026 ${getProfilEscaped().namaBumkam} &bull; SIKAT &bull; Sistem Informasi Kas Ayam Ternak
       </p>
     </div>
   `;

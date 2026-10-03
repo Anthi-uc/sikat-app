@@ -1,3 +1,4 @@
+import { getProfilEscaped } from '../profil-usaha.js';
 // kebijakan.js — Halaman Fitur & Kebijakan
 
 export function render(params = {}) {
@@ -52,7 +53,7 @@ export function render(params = {}) {
     <!-- Hak Cipta -->
     <div class="card" style="text-align:center;">
       <p style="font-size:var(--font-size-sm);color:var(--color-text-muted);">
-        &copy; 2026 BUMKam Torei Natei &bull; SIKAT &bull; Kampung Yakonde, Papua<br>
+        &copy; 2026 ${getProfilEscaped().namaBumkam} &bull; SIKAT &bull; ${getProfilEscaped().namaKampung}, Papua<br>
         Dikembangkan untuk mendukung usaha ayam petelur lokal.
       </p>
     </div>

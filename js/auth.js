@@ -1,4 +1,5 @@
 // auth.js — AuthService: manajemen akun multi-user offline-first
+import { getProfil } from './profil-usaha.js';
 
 const KEY_USERS   = 'sikat_users';
 const KEY_SESSION = 'sikat_current_user';
@@ -122,7 +123,7 @@ export const AuthService = {
     }
 
     const hashedPassword = await hashPassword(password);
-    const finalNamaUsaha = (namaUsaha && namaUsaha.trim()) ? namaUsaha.trim() : 'BUMKam Torei Natei';
+    const finalNamaUsaha = (namaUsaha && namaUsaha.trim()) ? namaUsaha.trim() : getProfil().namaBumkam;
 
     const user = {
       id:        genId(),
@@ -130,7 +131,7 @@ export const AuthService = {
       password:  hashedPassword,
       namaAdmin: namaAdmin.trim(),
       namaUsaha: finalNamaUsaha,
-      alamat:    'Kampung Yakonde, Papua',
+      alamat:    getProfil().namaKampung + ', Papua',
       whatsapp:  '',
       emailUsaha:'',
       foto:      null,

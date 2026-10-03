@@ -1,12 +1,14 @@
 // kontak.js — Halaman Kontak (Kartu 1: dinamis dari profil; Kartu 2: statis pengembang)
 
 import { AuthService } from '../auth.js';
+import { getProfil, getProfilEscaped } from '../profil-usaha.js';
 
 export function render(params = {}) {
   // ── Kartu 1: data dari profil pengguna aktif ──────────────────────────────
   const u = AuthService.getCurrentUser() || {};
-  const namaUsaha = u.namaUsaha  || 'BUMKam Torei Natei';
-  const alamat    = u.alamat     || 'Kampung Yakonde, Distrik Sentani Timur, Kabupaten Jayapura, Papua';
+  const _profil   = getProfil();
+  const namaUsaha = _profil.namaBumkam;
+  const alamat    = u.alamat     || (_profil.namaKampung + ', Distrik Sentani Timur, Kabupaten Jayapura, Papua');
   const wa        = u.whatsapp   || '';
   const emailUs   = u.emailUsaha || '';
 

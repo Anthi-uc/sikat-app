@@ -8,6 +8,7 @@ import {
   isIncome,
   normalizeTransaction,
 } from './categories.js';
+import { getProfil } from './profil-usaha.js';
 
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const BULAN = [
@@ -794,7 +795,7 @@ export const CalculationEngine = {
     const notes = [
       {
         title: 'Gambaran Umum Entitas',
-        body: 'BUMKam Torei Natei merupakan Badan Usaha Milik Kampung yang berkedudukan di Kampung Yakonde. Unit usaha utama saat ini adalah peternakan ayam petelur yang memproduksi dan memasarkan telur segar untuk kebutuhan masyarakat lokal dan sekitarnya.',
+        body: `${getProfil().namaBumkam} merupakan Badan Usaha Milik Kampung yang berkedudukan di ${getProfil().namaKampung}. Unit usaha utama saat ini adalah peternakan ayam petelur yang memproduksi dan memasarkan telur segar untuk kebutuhan masyarakat lokal dan sekitarnya.`,
       },
       {
         title: 'Dasar Penyusunan & Kebijakan Akuntansi',

@@ -2,6 +2,7 @@
 // Mendukung kategori bertingkat, kalkulasi otomatis Qty × Harga, dan stok telur real-time.
 
 import { StorageService } from '../storage.js';
+import { getProfilEscaped } from '../profil-usaha.js';
 import { isIncome as checkIsIncome, findCategoryAndSub } from '../categories.js';
 import { renderTransactionForm, attachTransactionFormListeners } from '../transaction-form.js';
 
@@ -60,7 +61,7 @@ export function render(params = {}) {
     <div class="welcome-card">
       <div class="icon">🧾</div>
       <h2>Catat Transaksi Baru</h2>
-      <p>Tambahkan pemasukan atau pengeluaran usaha BUMKam Torei Natei</p>
+      <p>Tambahkan pemasukan atau pengeluaran usaha ${getProfilEscaped().namaBumkam}</p>
     </div>
 
     <!-- Stok telur info banner -->

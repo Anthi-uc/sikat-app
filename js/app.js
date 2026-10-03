@@ -3,6 +3,7 @@
 import { navigate } from './router.js';
 import { StorageService, migrateLocalStorageUtf8 } from './storage.js';
 import { getNamaAdmin, getFotoProfil, DEFAULT_AVATAR_SVG } from './views/profil.js';
+import { getProfil, getProfilEscaped, onProfilUpdated } from './profil-usaha.js';
 
 // ─── SVG Logo ────────────────────────────────────────────────────────────────
 
@@ -314,7 +315,7 @@ export function renderFooter() {
         </div>
       </div>
       <p class="footer-copyright">
-        &copy; 2026 BUMKam Torei Natei &bull; SIKAT &bull; Sistem Informasi Kas Ayam Ternak
+        &copy; 2026 ${getProfilEscaped().namaBumkam} &bull; SIKAT &bull; Sistem Informasi Kas Ayam Ternak
       </p>
     </footer>`;
 
@@ -391,6 +392,10 @@ function initApp() {
 
       const targetHash = (location.hash && location.hash !== '#') ? location.hash : '#home';
       navigate(targetHash);
+
+      // Set document.title to reflect BUMKam name
+      const { namaBumkam: _initBumkam } = getProfil();
+      document.title = `SIKAT — ${_initBumkam}`;
     });
 
     if ('serviceWorker' in navigator) {

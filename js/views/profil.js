@@ -1,6 +1,7 @@
 // profil.js — Halaman Pengaturan Profil Admin
 
 import { AuthService } from '../auth.js';
+import { getProfil, saveProfil } from '../profil-usaha.js';
 import { showNotification, updateHeaderProfile } from '../app.js';
 import { navigate } from '../router.js';
 
@@ -66,6 +67,10 @@ export function render(params = {}) {
   const wa    = u.whatsapp   || '';
   const email = u.emailUsaha || '';
   const foto  = u.foto       || null;
+  // Profil usaha dari ProfilUsahaService (bukan dari akun user)
+  const profUsaha = getProfil();
+  const valBumkam  = profUsaha.namaBumkam.replace(/"/g, '&quot;');
+  const valKampung = profUsaha.namaKampung.replace(/"/g, '&quot;');
   const fotoStyle = foto ? `background-image:url('${foto}');background-size:cover;background-position:center;` : '';
 
   function val(v) { return v.replace(/"/g, '&quot;'); }
@@ -107,11 +112,29 @@ export function render(params = {}) {
           <span class="form-error" id="err-nama" hidden></span>
         </div>
 
-        <!-- Nama usaha -->
+        <!-- Nama BUMKam / Usaha (ProfilUsahaService) -->
         <div class="form-group">
-          <label class="form-label" for="input-usaha">Nama Usaha / BUMKam</label>
-          <input class="form-control" type="text" id="input-usaha" value="${val(usaha)}" maxlength="60" placeholder="BUMKam Torei Natei">
+          <label class="form-label" for="input-bumkam">Nama BUMKam / Nama Usaha <span style="color:var(--color-danger)">*</span></label>
+          <input class="form-control" type="text" id="input-bumkam"
+            value="${valBumkam}" maxlength="60"
+            placeholder="BUMKam Torei Natei"
+            aria-required="true" autocomplete="organization">
+          <span class="form-error" id="err-bumkam" hidden></span>
+          <p style="font-size:var(--font-size-xs);color:var(--color-text-muted);margin-top:2px;">Dipakai di seluruh laporan dan tampilan aplikasi.</p>
         </div>
+
+        <!-- Nama Kampung (ProfilUsahaService) -->
+        <div class="form-group">
+          <label class="form-label" for="input-kampung">Nama Kampung <span style="color:var(--color-danger)">*</span></label>
+          <input class="form-control" type="text" id="input-kampung"
+            value="${valKampung}" maxlength="60"
+            placeholder="Kampung Yakonde"
+            aria-required="true" autocomplete="address-level2">
+          <span class="form-error" id="err-kampung" hidden></span>
+        </div>
+
+        <!-- Nama usaha lama (tersembunyi — tetap disimpan di akun) -->
+        <input type="hidden" id="input-usaha" value="${val(usaha)}">
 
         <!-- Alamat -->
         <div class="form-group">
@@ -216,9 +239,25 @@ export function attachListeners(params = {}) {
         return;
       }
 
+      // Save profil usaha (BUMKam name + kampung) via ProfilUsahaService
+      const bumkamVal  = (document.getElementById('input-bumkam')?.value  || '').trim();
+      const kampungVal = (document.getElementById('input-kampung')?.value || '').trim();
+      const profilResult = saveProfil({ namaBumkam: bumkamVal, namaKampung: kampungVal });
+      if (!profilResult.ok) {
+        const errEl = document.getElementById(
+          profilResult.field === 'namaKampung' ? 'err-kampung' : 'err-bumkam');
+        if (errEl) { errEl.textContent = profilResult.error; errEl.removeAttribute('hidden'); }
+        return;
+      }
+      // Clear inline errors
+      ['err-bumkam','err-kampung'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.textContent = ''; el.setAttribute('hidden',''); }
+      });
+
       const updates = {
         namaAdmin:  nama,
-        namaUsaha:  (document.getElementById('input-usaha')?.value   || '').trim(),
+        namaUsaha:  bumkamVal,
         alamat:     (document.getElementById('input-alamat')?.value   || '').trim(),
         whatsapp:   (document.getElementById('input-wa')?.value       || '').trim(),
         emailUsaha: (document.getElementById('input-email-usaha')?.value || '').trim(),

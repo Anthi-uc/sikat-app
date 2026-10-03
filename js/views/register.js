@@ -4,6 +4,7 @@ import { AuthService } from '../auth.js';
 import { navigate } from '../router.js';
 import { renderHeader, logoSVG } from '../app.js';
 import { StorageService } from '../storage.js';
+import { getProfilEscaped } from '../profil-usaha.js';
 
 export function render(params = {}) {
   return `
@@ -79,7 +80,7 @@ export function render(params = {}) {
         </div>
 
         <p class="auth-copyright">
-          &copy; 2026 BUMKam Torei Natei &bull; SIKAT
+          &copy; 2026 ${getProfilEscaped().namaBumkam} &bull; SIKAT
         </p>
       </div>
     </div>

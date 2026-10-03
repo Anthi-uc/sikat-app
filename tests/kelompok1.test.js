@@ -109,7 +109,7 @@ describe('KELOMPOK 1: Perbaikan Tampilan SIKAT', () => {
 
     it('verifies sw.js caches the new icons and bumps cache version', () => {
       const sw = fs.readFileSync(swPath, 'utf8');
-      expect(sw).toContain('CACHE_NAME = \'sikat-v2.4\'');
+      expect(sw).toContain('CACHE_NAME = \'sikat-v2.5\'');
       expect(sw).toContain('./assets/icons/icon-maskable-512.png');
       expect(sw).toContain('./assets/icons/favicon.svg');
     });

@@ -17,6 +17,7 @@ import {
   renderTransactionForm,
   attachTransactionFormListeners,
 } from '../transaction-form.js';
+import { getProfil, getProfilEscaped, getSlugUsaha } from '../profil-usaha.js';
 
 // ═══════════════════════════════════════════════════════════════
 // SHARED HELPERS
@@ -88,20 +89,21 @@ function getTxDisplayInfo(t) {
 function kopHTML(judulLaporan, periode) {
   return `
     <div class="print-kop">
-      <h2>BUMKam Torei Natei</h2>
+      <h2>${getProfilEscaped().namaBumkam}</h2>
       <h3>${judulLaporan}</h3>
       <p>Periode: ${periode}</p>
-      <p>Kampung Yakonde</p>
+      <p>${getProfilEscaped().namaKampung}</p>
     </div>`;
 }
 
 function ttdHTML() {
   const today = new Date();
-  const tgl = `Yakonde, ${today.getDate()} ${_BULAN_NAMA[today.getMonth()]} ${today.getFullYear()}`;
+  const { namaKampung: _kmp, namaBumkam: _bkm } = getProfil();
+  const tgl = `${_kmp}, ${today.getDate()} ${_BULAN_NAMA[today.getMonth()]} ${today.getFullYear()}`;
   return `
     <div class="tanda-tangan-grid">
       <div class="tanda-tangan-box">
-        <p class="ttd-label">Mengetahui,<br>Kepala BUMKam Torei Natei</p>
+        <p class="ttd-label">Mengetahui,<br>Kepala ${getProfilEscaped().namaBumkam}</p>
         <div class="ttd-space"></div>
         <p class="ttd-name">( ________________________ )</p>
       </div>
@@ -176,7 +178,7 @@ export function render(params = {}) {
   return `
     <div class="welcome-card">
       <h2>Laporan Keuangan</h2>
-      <p>BUMKam Torei Natei — Sistem Informasi Kas Ayam Ternak</p>
+      <p>${getProfilEscaped().namaBumkam} — Sistem Informasi Kas Ayam Ternak</p>
     </div>
 
     <div role="tablist" aria-label="Tab Laporan" class="laporan-tabs">
@@ -871,7 +873,7 @@ function _listenLabarugi() {
     const lr  = CalculationEngine.calculateLabaRugi(txs, _lrYear, _lrMonth);
     const bl  = `${_BULAN_NAMA[_lrMonth]}-${_lrYear}`;
     _exportExcel([
-      ['BUMKam Torei Natei — Laporan Laba Rugi', '', ''],
+      [`${getProfil().namaBumkam} — Laporan Laba Rugi`, '', ''],
       ['Periode', bl, ''],
       [''],
       ['Keterangan', 'Jumlah (Rp)', ''],
@@ -918,7 +920,7 @@ function _listenArusKas() {
     const bl       = `${_BULAN_NAMA[_akMonth]}-${_akYear}`;
 
     const rows = [
-      ['BUMKam Torei Natei — Laporan Arus Kas', '','','','','',''],
+      [`${getProfil().namaBumkam} — Laporan Arus Kas`, '','','','','',''],
       ['Periode', bl,'','','','',''],
       [''],
       ['Tanggal','Keterangan','Aktivitas','Lokasi','Kas Masuk','Kas Keluar','Saldo'],
@@ -964,7 +966,7 @@ function _listenNeraca() {
     const bl         = `${_BULAN_NAMA[_neMonth]}-${_neYear}`;
 
     _exportExcel([
-      ['BUMKam Torei Natei — Neraca (Posisi Keuangan)', ''],
+      [`${getProfil().namaBumkam} — Neraca (Posisi Keuangan)`, ''],
       ['Per akhir', bl],
       ['Status Keseimbangan', ne.balance ? 'SEIMBANG (BALANCE)' : 'BELUM SEIMBANG'],
       [''],
@@ -1040,7 +1042,7 @@ function _listenBukuKas() {
     const bl       = `${_BULAN_NAMA[_bkMonth]}-${_bkYear}`;
 
     const rows = [
-      ['BUMKam Torei Natei — Buku Kas', '', '', '', '', '', '', ''],
+      [`${getProfil().namaBumkam} — Buku Kas`, '', '', '', '', '', '', ''],
       ['Periode', bl, '', '', '', '', '', ''],
       [''],
       ['Tanggal', 'Keterangan', 'Lokasi', 'Kuantitas', 'Harga Satuan', 'Debit (+)', 'Kredit (−)', 'Saldo'],
