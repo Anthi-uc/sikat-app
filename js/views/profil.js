@@ -71,6 +71,7 @@ export function render(params = {}) {
   const profUsaha = getProfil();
   const valBumkam  = profUsaha.namaBumkam.replace(/"/g, '&quot;');
   const valKampung = profUsaha.namaKampung.replace(/"/g, '&quot;');
+  const valDasarHukum = profUsaha.dasarHukumPendirian.replace(/"/g, '&quot;');
   const fotoStyle = foto ? `background-image:url('${foto}');background-size:cover;background-position:center;` : '';
 
   function val(v) { return v.replace(/"/g, '&quot;'); }
@@ -131,6 +132,16 @@ export function render(params = {}) {
             placeholder="Kampung Yakonde"
             aria-required="true" autocomplete="address-level2">
           <span class="form-error" id="err-kampung" hidden></span>
+        </div>
+
+        <!-- Dasar Hukum Pendirian (ProfilUsahaService) - opsional -->
+        <div class="form-group">
+          <label class="form-label" for="input-dasar-hukum">Dasar Hukum Pendirian (opsional)</label>
+          <input class="form-control" type="text" id="input-dasar-hukum"
+            value="${valDasarHukum}" maxlength="200"
+            placeholder="Contoh: Peraturan Kampung No. 1/2023 atau AD/ART BUMKam">
+          <span class="form-error" id="err-dasar-hukum" hidden></span>
+          <p style="font-size:var(--font-size-xs);color:var(--color-text-muted);margin-top:2px;">Nomor peraturan kampung, Perbup, atau AD/ART yang menjadi dasar pendirian.</p>
         </div>
 
         <!-- Nama usaha lama (tersembunyi — tetap disimpan di akun) -->
@@ -239,18 +250,29 @@ export function attachListeners(params = {}) {
         return;
       }
 
-      // Save profil usaha (BUMKam name + kampung) via ProfilUsahaService
+      // Save profil usaha (BUMKam name + kampung + dasar hukum) via ProfilUsahaService
       const bumkamVal  = (document.getElementById('input-bumkam')?.value  || '').trim();
       const kampungVal = (document.getElementById('input-kampung')?.value || '').trim();
-      const profilResult = saveProfil({ namaBumkam: bumkamVal, namaKampung: kampungVal });
+      const dasarHukumVal = (document.getElementById('input-dasar-hukum')?.value || '').trim();
+      const profilResult = saveProfil({ 
+        namaBumkam: bumkamVal, 
+        namaKampung: kampungVal,
+        dasarHukumPendirian: dasarHukumVal
+      });
       if (!profilResult.ok) {
-        const errEl = document.getElementById(
-          profilResult.field === 'namaKampung' ? 'err-kampung' : 'err-bumkam');
+        let errEl;
+        if (profilResult.field === 'namaKampung') {
+          errEl = document.getElementById('err-kampung');
+        } else if (profilResult.field === 'dasarHukumPendirian') {
+          errEl = document.getElementById('err-dasar-hukum');
+        } else {
+          errEl = document.getElementById('err-bumkam');
+        }
         if (errEl) { errEl.textContent = profilResult.error; errEl.removeAttribute('hidden'); }
         return;
       }
       // Clear inline errors
-      ['err-bumkam','err-kampung'].forEach(id => {
+      ['err-bumkam','err-kampung','err-dasar-hukum'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.textContent = ''; el.setAttribute('hidden',''); }
       });

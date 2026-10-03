@@ -7,9 +7,11 @@ const KEY = 'profil_usaha';
 const DEFAULTS = {
   namaBumkam:  'BUMKam Torei Natei',
   namaKampung: 'Kampung Yakonde',
+  dasarHukumPendirian: '',
 };
 
 const MAX_LEN = 60;
+const MAX_LEN_DASAR_HUKUM = 200;
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -26,7 +28,7 @@ function _escHtml(s) {
 /**
  * Read the business profile from localStorage.
  * Always returns a complete object; falls back to defaults on any error.
- * @returns {{ namaBumkam: string, namaKampung: string }}
+ * @returns {{ namaBumkam: string, namaKampung: string, dasarHukumPendirian: string }}
  */
 export function getProfil() {
   try {
@@ -35,7 +37,8 @@ export function getProfil() {
     const parsed = JSON.parse(raw);
     const namaBumkam  = (parsed.namaBumkam  && String(parsed.namaBumkam).trim())  || DEFAULTS.namaBumkam;
     const namaKampung = (parsed.namaKampung && String(parsed.namaKampung).trim()) || DEFAULTS.namaKampung;
-    return { namaBumkam, namaKampung };
+    const dasarHukumPendirian = (parsed.dasarHukumPendirian && String(parsed.dasarHukumPendirian).trim()) || DEFAULTS.dasarHukumPendirian;
+    return { namaBumkam, namaKampung, dasarHukumPendirian };
   } catch {
     return { ...DEFAULTS };
   }
@@ -44,24 +47,26 @@ export function getProfil() {
 /**
  * Like getProfil(), but values are HTML-escaped for safe insertion into innerHTML.
  * Raw (unescaped) values are stored in localStorage; escaping is render-time only.
- * @returns {{ namaBumkam: string, namaKampung: string }}
+ * @returns {{ namaBumkam: string, namaKampung: string, dasarHukumPendirian: string }}
  */
 export function getProfilEscaped() {
   const p = getProfil();
   return {
     namaBumkam:  _escHtml(p.namaBumkam),
     namaKampung: _escHtml(p.namaKampung),
+    dasarHukumPendirian: _escHtml(p.dasarHukumPendirian),
   };
 }
 
 /**
  * Validate and save the business profile.
- * @param {{ namaBumkam: string, namaKampung: string }} data
- * @returns {{ ok: boolean, error?: string, field?: 'namaBumkam'|'namaKampung' }}
+ * @param {{ namaBumkam: string, namaKampung: string, dasarHukumPendirian?: string }} data
+ * @returns {{ ok: boolean, error?: string, field?: 'namaBumkam'|'namaKampung'|'dasarHukumPendirian' }}
  */
 export function saveProfil(data) {
   const namaBumkam  = String(data?.namaBumkam  ?? '').trim();
   const namaKampung = String(data?.namaKampung ?? '').trim();
+  const dasarHukumPendirian = String(data?.dasarHukumPendirian ?? '').trim();
 
   if (!namaBumkam) {
     return { ok: false, error: 'Nama BUMKam / Usaha wajib diisi.', field: 'namaBumkam' };
@@ -75,14 +80,17 @@ export function saveProfil(data) {
   if (namaKampung.length > MAX_LEN) {
     return { ok: false, error: 'Nama Kampung maksimal 60 karakter.', field: 'namaKampung' };
   }
+  if (dasarHukumPendirian.length > MAX_LEN_DASAR_HUKUM) {
+    return { ok: false, error: 'Dasar Hukum Pendirian maksimal 200 karakter.', field: 'dasarHukumPendirian' };
+  }
 
   try {
-    localStorage.setItem(KEY, JSON.stringify({ namaBumkam, namaKampung }));
+    localStorage.setItem(KEY, JSON.stringify({ namaBumkam, namaKampung, dasarHukumPendirian }));
 
     // Broadcast change so other components (and other tabs) can react
     try {
       const bc = new BroadcastChannel('sikat_profil_usaha');
-      bc.postMessage({ type: 'profil-usaha-updated', namaBumkam, namaKampung });
+      bc.postMessage({ type: 'profil-usaha-updated', namaBumkam, namaKampung, dasarHukumPendirian });
       bc.close();
     } catch {
       // BroadcastChannel not available (test env / old browser) — silent
@@ -112,7 +120,7 @@ export function getSlugUsaha() {
  * Register a listener that fires whenever the profile is updated in this tab
  * (via saveProfil) OR from another tab (via BroadcastChannel).
  * Returns a cleanup function — call it to unsubscribe.
- * @param {(profil: { namaBumkam: string, namaKampung: string }) => void} cb
+ * @param {(profil: { namaBumkam: string, namaKampung: string, dasarHukumPendirian: string }) => void} cb
  * @returns {() => void}
  */
 export function onProfilUpdated(cb) {
@@ -121,7 +129,11 @@ export function onProfilUpdated(cb) {
     bc = new BroadcastChannel('sikat_profil_usaha');
     bc.addEventListener('message', (ev) => {
       if (ev.data?.type === 'profil-usaha-updated') {
-        cb({ namaBumkam: ev.data.namaBumkam, namaKampung: ev.data.namaKampung });
+        cb({ 
+          namaBumkam: ev.data.namaBumkam, 
+          namaKampung: ev.data.namaKampung,
+          dasarHukumPendirian: ev.data.dasarHukumPendirian || ''
+        });
       }
     });
   } catch {

@@ -792,14 +792,26 @@ export const CalculationEngine = {
       .filter(t => t.tanggal && t.tanggal.startsWith(pfx))
       .map(normalizeTransaction);
 
+    const profil = getProfil();
     const notes = [
       {
         title: 'Gambaran Umum Entitas',
-        body: `${getProfil().namaBumkam} merupakan Badan Usaha Milik Kampung yang berkedudukan di ${getProfil().namaKampung}. Unit usaha utama saat ini adalah peternakan ayam petelur yang memproduksi dan memasarkan telur segar untuk kebutuhan masyarakat lokal dan sekitarnya.`,
+        body: `${profil.namaBumkam} merupakan Badan Usaha Milik Kampung yang berkedudukan di ${profil.namaKampung}. Unit usaha utama saat ini adalah peternakan ayam petelur yang memproduksi dan memasarkan telur segar untuk kebutuhan masyarakat lokal dan sekitarnya.`,
       },
+    ];
+
+    // Tambahkan catatan Dasar Hukum Pendirian hanya bila terisi
+    if (profil.dasarHukumPendirian) {
+      notes.push({
+        title: 'Dasar Hukum Pendirian',
+        body: `${profil.namaBumkam} didirikan berdasarkan ${profil.dasarHukumPendirian}.`,
+      });
+    }
+
+    notes.push(
       {
         title: 'Dasar Penyusunan & Kebijakan Akuntansi',
-        body: 'Laporan Keuangan disusun berdasarkan prinsip pembukuan sederhana BUMKam berbasis kas yang dimodifikasi. Pendapatan diakui saat kas diterima dan beban diakui saat kas dikeluarkan, dengan pencatatan aset tetap peralatan dan pengakuan nilai persediaan telur.',
+        body: `Laporan Keuangan disusun berdasarkan SAK EMKM (Standar Akuntansi Keuangan Entitas Mikro, Kecil, dan Menengah) yang efektif sejak 1 Januari 2018, dan mengacu pada PP Nomor 11 Tahun 2021 tentang Badan Usaha Milik Desa serta Keputusan Menteri Desa PDTT Nomor 136 Tahun 2022 tentang Panduan Penyusunan Laporan Keuangan BUM Desa. ${profil.namaBumkam} menerapkan basis kas yang dimodifikasi: pendapatan diakui saat kas diterima, beban diakui saat kas dikeluarkan, dengan pencatatan aset tetap dan persediaan.`,
       },
       {
         title: 'Rincian Kas dan Aset',
@@ -812,8 +824,8 @@ export const CalculationEngine = {
       {
         title: 'Kewajiban dan Komitmen',
         body: `Total kewajiban tercatat sebesar Rp ${Number(neraca.kewajiban.totalKewajiban).toLocaleString('id-ID')}. Seluruh kewajiban operasional dikelola secara berkala sesuai ketentuan BUMKam.`,
-      },
-    ];
+      }
+    );
 
     notes.neraca = neraca;
     notes.labaRugi = labaRugi;
